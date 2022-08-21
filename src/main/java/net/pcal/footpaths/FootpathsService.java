@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -160,37 +161,40 @@ public class FootpathsService {
      * Otherwise, returns null.
      */
 
-    record BootInfo(Identifier bootId, List<EnchantInfo> enchantments) {}
-    record EnchantInfo(Identifier enchantId, int level) {}
+    record BootInfo(Identifier bootId, Set<Identifier> enchantments) {}
+
+    private static BootInfo getBootInfo(Iterable<ItemStack> armorItems) {
+        for (ItemStack armor : armorItems) {
+            final BootInfo bootInfo = getBootInfo(armor);
+            if (bootInfo != null) return bootInfo;
+        }
+        return BAREFOOT;
+    }
+
+    private static final BootInfo BAREFOOT = new BootInfo(new Identifier("minecraft:none"), Collections.emptySet());
 
     /**
      * Return info about the footwear in the given stack, or null if it isn't footwear.
      */
     private static BootInfo getBootInfo(ItemStack stack) {
-        if (!(stack.getItem() instanceof ArmorItem)) return null;
-        final ArmorItem armor = (ArmorItem)stack.getItem();
+        if (!(stack.getItem() instanceof final ArmorItem armor)) return null;
         if (armor.getSlotType() != EquipmentSlot.FEET) return null;
         final Identifier bootId = Registry.ITEM.getId(stack.getItem());
         final NbtList enchants = stack.getEnchantments();
         if (enchants == null || enchants.isEmpty()) {
             return new BootInfo(bootId, null);
         } else {
-            final List<EnchantInfo> enchantInfos = new ArrayList<>();
+            final Set<Identifier> enchantIds = new HashSet<>();
             for(final NbtElement enchant : enchants) {
                 if (enchant instanceof final NbtCompound compound) {
                     final String id = requireNonNull(compound.getString("id"));
-                    final int lvl = compound.getInt("lvl");
-                    enchantInfos.add(new EnchantInfo(new Identifier(id), lvl));
+                    // final int lvl = compound.getInt("lvl"); TODO someday?
+                    enchantIds.add(new Identifier(id));
                 }
             }
-            return new BootInfo(bootId, enchantInfos);
+            return new BootInfo(bootId, enchantIds);
         }
     }
-
-    private boolean isMatch(Rule rule) {
-
-    }
-
 
     private void triggerRule(Rule rule, World world) {
         final BlockHistory bh = this.stepCounts.get(pos);
