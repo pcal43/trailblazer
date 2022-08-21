@@ -72,7 +72,7 @@ public class FootpathsInitializer implements ModInitializer {
         //
         final Gson gson = new Gson();
         final GsonConfig gsonConfig = gson.fromJson(stripComments(effectiveConfigRaw), GsonConfig.class);
-        FootpathsService.getInstance().initBlockConfig(loadConfig(gsonConfig));
+        FootpathsService.getInstance().configure(loadConfig(gsonConfig));
         //
         // All done
         //
@@ -86,15 +86,19 @@ public class FootpathsInitializer implements ModInitializer {
         requireNonNull(config);
         final FootpathsRuntimeConfig.Builder builder = FootpathsRuntimeConfig.builder();
         for(GsonBlockConfig gsonBlock : config.blocks) {
-            final Identifier blockId = new Identifier(requireNonNull(gsonBlock.id));
-            final FootpathsRuntimeConfig.RuntimeBlockConfig rbc = new FootpathsRuntimeConfig.RuntimeBlockConfig(
-                    gsonBlock.nextId == null ? null : new Identifier(gsonBlock.nextId),
+            final FootpathsRuntimeConfig.Rule rule = new FootpathsRuntimeConfig.Rule(
+                    new Identifier(requireNonNull(gsonBlock.id)),
+                    new Identifier(requireNonNull(gsonBlock.nextId)),
                     requireNonNull(gsonBlock.stepCount),
                     requireNonNull(gsonBlock.timeoutTicks),
                     toIdentifierSet(gsonBlock.entityIds),
-                    ImmutableSet.copyOf(gsonBlock.spawnGroups)
+                    ImmutableSet.copyOf(gsonBlock.spawnGroups),
+                    toIdentifierSet(gsonBlock.skipIfBootIds),
+                    toIdentifierSet(gsonBlock.skipIfBootNbts),
+                    toIdentifierSet(gsonBlock.onlyIfBootIds),
+                    toIdentifierSet(gsonBlock.onlyIfBootNbts)
             );
-            builder.blockConfig(blockId, rbc);
+            builder.rule(rule);
         }
         return builder.build();
     }
@@ -131,5 +135,9 @@ public class FootpathsInitializer implements ModInitializer {
         Integer stepCount;
         List<String> entityIds;
         List<String> spawnGroups;
+        List<String> onlyIfBootIds;
+        List<String> onlyIfBootNbts;
+        List<String> skipIfBootIds;
+        List<String> skipIfBootNbts;
     }
 }
