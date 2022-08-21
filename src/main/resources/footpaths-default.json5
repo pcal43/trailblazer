@@ -93,39 +93,46 @@
 
 
 //
-// Crazier ideas
+// Other stuff you can try
 //
 
 //
 // Fire Walker Boots
 // {
-//  'bootId'             : 'minecraft:lava',
+//  'bootId'         : 'minecraft:lava',
 //  'nextId'         : 'minecraft:cobblestone',
 //  'onlyIfBootIds'  : [ 'minecraft:netherite_boots' ],
 //  'onlyIfBootNbts' : [ 'minecraft:frost_walker' ],
 // }
 
 //
+// No Shoes On the Grass
+// {
+//  'bootId'         : 'minecraft:grass',
+//  'nextId'         : 'minecraft:dirt',
+//  'skipIfBootIds'  : [ 'minecraft:none' ],
+// }
+
+//
 // Creeper Trails
 // {
-//  'bootId'             : 'minecraft:grass_block',
+//  'bootId'         : 'minecraft:grass_block',
 //  'nextId'         : 'minecraft:slime_block',
 //  'entityIds'      : [ 'minecraft:creeper' ],
 // }
 
 //
-// King Midas
+// King Midas' Shoes
 // {
-//  'bootId'             : 'minecraft:andesite_block',
+//  'bootId'         : 'minecraft:andesite_block',
 //  'nextId'         : 'minecraft:gold_block',
 //  'onlyIfBootIds'  : [ 'minecraft:golden_boots' ],
 // }
 
-
 //
 // Boom Boots!
 // {
-//  'bootId'             : 'minecraft:lava',
+//  'bootId'         : 'minecraft:lava',
 //  'nextId'         : 'minecraft:tnt',
 //  'onlyIfBootIds'  : [ 'minecraft:chainmail_boots' ],
 //  'onlyIfBootNbts' : [ 'minecraft:fire_protection' ],

@@ -1,10 +1,12 @@
 package net.pcal.footpaths;
 
+import com.google.common.collect.*;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 
@@ -15,37 +17,41 @@ import static java.util.Objects.requireNonNull;
 class FootpathsRuntimeConfig {
 
     private final List<Rule> rules;
-    private final Predicate<Identifier> entityMatcher;
-    private final Predicate<Identifier> blockMatcher;
+    private final ListMultimap<Identifier, Rule> rulesPerBlock = ArrayListMultimap.create();
+    private final SetMultimap<Identifier, Rule> rulesPerEntity = HashMultimap.create();
+    private final SetMultimap<SpawnGroup, Rule> rulesPerSpawnGroup = HashMultimap.create();
 
     private FootpathsRuntimeConfig(List<Rule> rules) {
         this.rules = requireNonNull(rules);
-        this.entityMatcher = s -> true;
-        this.blockMatcher = s -> true;
+        for (final Rule rule : rules) {
+            this.rulesPerBlock.put(rule.blockId(), rule);
+            rule.entityIds().forEach(id -> this.rulesPerEntity.put(id, rule));
+            rule.spawnGroups().forEach(group -> this.rulesPerSpawnGroup.put(group, rule));
+        }
     }
 
-    List<Rule> getRuleListForEntity(Entity entity) {
-//        if (this.watchedEntityIds != null) {
-//            // abort if it's not an entity we care about
-//            final Identifier entityId = Registry.ENTITY_TYPE.getId(entity.getType());
-//            if (this.watchedEntityIds.contains(entityId)) return;
-//        }
-//        if (this.watchedSpawnGroups != null) {
-//            //FIXME logic is broken here
-//
-//            // bail if it's not an entity we care about
-//            final SpawnGroup group = entity.getType().getSpawnGroup();
-//            if (this.watchedSpawnGroups.contains(group.getName())) return;
-//        }
-
-    }
-
-    Set<Rule> getRulesForBlock(Identifier block) {
-
-    }
-
-    public List<Rule> getRules() {
+    List<Rule> getAllRules() {
         return this.rules;
+    }
+
+    List<Rule> getRuleListForBlock(Identifier blockId) {
+        return this.rulesPerBlock.get(blockId);
+    }
+
+    Set<Rule> getRulesForEntity(Entity entity) {
+        final Identifier entityId = Registry.ENTITY_TYPE.getId(entity.getType());
+        if (this.rulesPerSpawnGroup.isEmpty()) {
+            return this.rulesPerEntity.get(entityId);
+        } else {
+            final SpawnGroup spawnGroup = entity.getType().getSpawnGroup();
+            final Set<Rule> spawnGroupRules = this.rulesPerSpawnGroup.get(spawnGroup);
+            if (spawnGroupRules.isEmpty()) {
+                return this.rulesPerEntity.get(entityId);
+            } else {
+                // FIXME? I suppose we could also be build up a cache of these things
+                return Sets.union(this.rulesPerEntity.get(entityId), spawnGroupRules);
+            }
+        }
     }
 
     record Rule(
@@ -54,7 +60,7 @@ class FootpathsRuntimeConfig {
             int stepCount,
             int timeoutTicks,
             Set<Identifier> entityIds,
-            Set<String> spawnGroups,
+            Set<SpawnGroup> spawnGroups,
             Set<Identifier> skipIfBootIds,
             Set<Identifier> skipIfBootNbts,
             Set<Identifier> onlyIfBootIds,
@@ -67,7 +73,7 @@ class FootpathsRuntimeConfig {
                 int stepCount,
                 int timeoutTicks,
                 Set<Identifier> entityIds,
-                Set<String> spawnGroups,
+                Set<SpawnGroup> spawnGroups,
                 Set<Identifier> skipIfBootIds,
                 Set<Identifier> skipIfBootNbts,
                 Set<Identifier> onlyIfBootIds,
@@ -82,11 +88,6 @@ class FootpathsRuntimeConfig {
             this.skipIfBootNbts = emptySetIfNull(skipIfBootNbts);
             this.onlyIfBootIds = emptySetIfNull(onlyIfBootIds);
             this.onlyIfBootNbts = emptySetIfNull(onlyIfBootNbts);
-        }
-
-        private boolean hasBootRules() {
-            return !(skipIfBootIds.isEmpty() && skipIfBootNbts.isEmpty()
-                    && onlyIfBootIds.isEmpty() && onlyIfBootNbts.isEmpty());
         }
 
         private static <T> Set<T> emptySetIfNull(Set<T> set) {

@@ -6,7 +6,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -35,12 +34,6 @@ public class FootpathsService {
 
     public static final String LOGGER_NAME = "footpaths";
     public static final String LOG_PREFIX = "[Footpaths] ";
-
-    // ===================================================================================
-    // Fields
-
-    private Set<Identifier> watchedEntityIds, watchedBlockIds;
-    private Set<String> watchedSpawnGroups;
 
     // ===================================================================================
     // Singleton
@@ -81,16 +74,6 @@ public class FootpathsService {
 
     public void configure(FootpathsRuntimeConfig config) {
         this.config = requireNonNull(config);
-        this.watchedSpawnGroups = new HashSet<>();
-        this.watchedEntityIds = new HashSet<>();
-        this.watchedBlockIds = new HashSet<>();
-        for(Rule rbc : config.getRules()) {
-            this.watchedSpawnGroups.addAll(rbc.spawnGroups());
-            this.watchedEntityIds.addAll(rbc.entityIds());
-            this.watchedBlockIds.add(requireNonNull(rbc.blockId()));
-        }
-        if (this.watchedEntityIds.isEmpty()) this.watchedEntityIds = null;
-        if (this.watchedSpawnGroups.isEmpty()) this.watchedSpawnGroups = null;
     }
 
     // ===================================================================================
@@ -104,8 +87,8 @@ public class FootpathsService {
      * This will be called whenever an entity moves to a new block.
      */
     public void entitySteppedOnBlock(Entity entity) {
-        final List<Rule> rules = this.config.getRuleListForEntity(entity);
-        if (rules == null || rules.isEmpty()) {
+        final Set<Rule> entityRuleSet = this.config.getRulesForEntity(entity);
+        if (entityRuleSet == null || entityRuleSet.isEmpty()) {
             // Most mob movements presumably won't trigger a rule, so let's short-circuit
             // that case as quickly as possible.
             return;
@@ -125,57 +108,52 @@ public class FootpathsService {
 
         // Get the rules that might apply to that block.  This just lets us avoid processing
         // rules if they don't apply to the block (which is most of the time).
-        final Set<Rule> blockRules = this.config.getRulesForBlock(blockId);
+        final List<Rule> blockRules = this.config.getRuleListForBlock(blockId);
         if (blockRules == null) return;
 
         logger.debug(() -> "checking " + blockId);
 
-        for (Rule rule : rules) {
+        final BootInfo bootInfo = getBootInfo(entity);
+        for (Rule rule : blockRules) {
             if (!blockId.equals(rule.blockId())) continue;
-            if (rule.hasBootRules()) {
-                for(ItemStack armor : entity.getArmorItems()) {
-                    final BootInfo bootInfo = getBootInfo(armor);
-                    if (bootInfo == null) continue;
-                    if (!rule.onlyIfBootIds().isEmpty()) {
-                        if (!rule.onlyIfBootIds().contains(bootInfo.bootId())) continue;
-                    }
-                    if (!rule.skipIfBootIds().isEmpty()) {
-                        if (rule.skipIfBootIds().contains(bootInfo.bootId())) continue;
-                    }
-                    //FIXME enchants
-                }
+            if (!entityRuleSet.contains(rule)) continue;
+            if (!rule.onlyIfBootIds().isEmpty()) {
+                if (!rule.onlyIfBootIds().contains(bootInfo.bootId())) continue;
             }
-
-            if (isMatch(rule)) {
-                triggerRule(rule, world);
-                return;
+            if (!rule.skipIfBootNbts().isEmpty()) {
+                if (rule.skipIfBootNbts().containsAll(bootInfo.enchantments())) continue;
             }
+            if (!rule.onlyIfBootIds().isEmpty()) {
+                if (rule.skipIfBootIds().contains(bootInfo.bootId())) continue;
+            }
+            if (!rule.onlyIfBootNbts().isEmpty()) {
+                if (!rule.onlyIfBootNbts().containsAll(bootInfo.enchantments())) continue;
+            }
+            triggerRule(rule, world, pos, block);
+            return;
         }
-
     }
 
-    /**
-     * If the given stack is a pair of boots, returns a Pair of
-     * - the boot item bootId
-     * - the NbtList fot the boot's enchantments
-     * Otherwise, returns null.
-     */
 
     record BootInfo(Identifier bootId, Set<Identifier> enchantments) {}
 
-    private static BootInfo getBootInfo(Iterable<ItemStack> armorItems) {
-        for (ItemStack armor : armorItems) {
+    private static final BootInfo BAREFOOT = new BootInfo(new Identifier("minecraft:none"), Collections.emptySet());
+
+
+    /**
+     * Return info for the boots the player is wearing.
+     */
+    private static BootInfo getBootInfo(Entity entity) {
+        for (ItemStack armor : entity.getArmorItems()) {
             final BootInfo bootInfo = getBootInfo(armor);
             if (bootInfo != null) return bootInfo;
         }
         return BAREFOOT;
     }
 
-    private static final BootInfo BAREFOOT = new BootInfo(new Identifier("minecraft:none"), Collections.emptySet());
-
-    /**
-     * Return info about the footwear in the given stack, or null if it isn't footwear.
-     */
+        /**
+         * Return info about the footwear in the given stack, or null if it isn't footwear.
+         */
     private static BootInfo getBootInfo(ItemStack stack) {
         if (!(stack.getItem() instanceof final ArmorItem armor)) return null;
         if (armor.getSlotType() != EquipmentSlot.FEET) return null;
@@ -185,7 +163,7 @@ public class FootpathsService {
             return new BootInfo(bootId, null);
         } else {
             final Set<Identifier> enchantIds = new HashSet<>();
-            for(final NbtElement enchant : enchants) {
+            for (final NbtElement enchant : enchants) {
                 if (enchant instanceof final NbtCompound compound) {
                     final String id = requireNonNull(compound.getString("id"));
                     // final int lvl = compound.getInt("lvl"); TODO someday?
@@ -196,7 +174,7 @@ public class FootpathsService {
         }
     }
 
-    private void triggerRule(Rule rule, World world) {
+    private void triggerRule(Rule rule, World world, BlockPos pos, Block block) {
         final BlockHistory bh = this.stepCounts.get(pos);
         final int blockStepCount;
         if (bh == null) {
