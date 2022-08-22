@@ -21,7 +21,7 @@ class FootpathsRuntimeConfig {
     private final SetMultimap<Identifier, Rule> rulesPerEntity = HashMultimap.create();
     private final SetMultimap<SpawnGroup, Rule> rulesPerSpawnGroup = HashMultimap.create();
 
-    private FootpathsRuntimeConfig(List<Rule> rules) {
+    FootpathsRuntimeConfig(List<Rule> rules) {
         this.rules = requireNonNull(rules);
         for (final Rule rule : rules) {
             this.rulesPerBlock.put(rule.blockId(), rule);

@@ -1,9 +1,12 @@
 package net.pcal.footpaths;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
+import net.pcal.footpaths.FootpathsRuntimeConfig.Rule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,6 +43,9 @@ public class FootpathsInitializer implements ModInitializer {
         }
     }
 
+    // ===================================================================================
+    // Private methods
+
     private void initialize() throws IOException {
         final Logger logger = LogManager.getLogger(LOGGER_NAME);
         //
@@ -71,7 +77,7 @@ public class FootpathsInitializer implements ModInitializer {
         // Apply the config
         //
         final Gson gson = new Gson();
-        final GsonConfig gsonConfig = gson.fromJson(stripComments(effectiveConfigRaw), GsonConfig.class);
+        final GsonModConfig gsonConfig = gson.fromJson(stripComments(effectiveConfigRaw), GsonModConfig.class);
         FootpathsService.getInstance().configure(loadConfig(gsonConfig));
         //
         // All done
@@ -79,35 +85,38 @@ public class FootpathsInitializer implements ModInitializer {
         logger.info(LOG_PREFIX + "Initialized" + (isCustomConfig ? " with custom configuration." : "."));
     }
 
-    // ===================================================================================
-    // Private methods
-
-    private static FootpathsRuntimeConfig loadConfig(GsonConfig config) {
+    private static FootpathsRuntimeConfig loadConfig(GsonModConfig config) {
         requireNonNull(config);
-        final FootpathsRuntimeConfig.Builder builder = FootpathsRuntimeConfig.builder();
-        for(GsonBlockConfig gsonBlock : config.blocks) {
-            final FootpathsRuntimeConfig.Rule rule = new FootpathsRuntimeConfig.Rule(
-                    new Identifier(requireNonNull(gsonBlock.id)),
-                    new Identifier(requireNonNull(gsonBlock.nextId)),
+        final ImmutableList.Builder<Rule> builder = ImmutableList.builder();
+        for (final GsonRuleConfig gsonBlock : config.rules) {
+            final Rule rule = new Rule(
+                    new Identifier(requireNonNull(gsonBlock.blockId)),
+                    new Identifier(requireNonNull(gsonBlock.nextBlockId)),
                     requireNonNull(gsonBlock.stepCount),
                     requireNonNull(gsonBlock.timeoutTicks),
                     toIdentifierSet(gsonBlock.entityIds),
-                    ImmutableSet.copyOf(gsonBlock.spawnGroups),
+                    toSpawnGroupList(gsonBlock.spawnGroups),
                     toIdentifierSet(gsonBlock.skipIfBootIds),
                     toIdentifierSet(gsonBlock.skipIfBootNbts),
                     toIdentifierSet(gsonBlock.onlyIfBootIds),
                     toIdentifierSet(gsonBlock.onlyIfBootNbts)
             );
-            builder.rule(rule);
+            builder.add(rule);
         }
-        return builder.build();
+        return new FootpathsRuntimeConfig(builder.build());
     }
 
     private static Set<Identifier> toIdentifierSet(List<String> rawIds) {
         final ImmutableSet.Builder<Identifier> builder = ImmutableSet.builder();
-        for(String rawId : rawIds) {
+        for (String rawId : rawIds) {
             builder.add(new Identifier(rawId));
         }
+        return builder.build();
+    }
+
+    private static Set<SpawnGroup> toSpawnGroupList(Iterable<String> rawIds) {
+        final ImmutableSet.Builder<SpawnGroup> builder = ImmutableSet.builder();
+        rawIds.forEach(sg -> builder.add(SpawnGroup.valueOf(sg)));
         return builder.build();
     }
 
@@ -124,13 +133,13 @@ public class FootpathsInitializer implements ModInitializer {
     // ===================================================================================
     // Gson model
 
-    public static class GsonConfig {
-        public List<GsonBlockConfig> blocks;
+    public static class GsonModConfig {
+        public List<GsonRuleConfig> rules;
     }
 
-    public static class GsonBlockConfig {
-        public String id;
-        public String nextId;
+    public static class GsonRuleConfig {
+        public String blockId;
+        public String nextBlockId;
         Integer timeoutTicks;
         Integer stepCount;
         List<String> entityIds;
