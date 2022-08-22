@@ -1,5 +1,6 @@
 package net.pcal.footpaths;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.math.DoubleMath;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -113,33 +114,29 @@ public class FootpathsService {
 
         logger.debug(() -> "checking " + blockId);
 
-        final BootInfo bootInfo = getBootInfo(entity);
+        final Set<Identifier> bootInfo = getBootInfo(entity);
         for (Rule rule : blockRules) {
             if (!blockId.equals(rule.blockId())) continue;
             if (!entityRuleSet.contains(rule)) continue;
             if (!rule.onlyIfBootIds().isEmpty()) {
-                if (!rule.onlyIfBootIds().contains(bootInfo.bootId())) continue;
+                if (!bootInfo.containsAll(rule.onlyIfBootIds())) continue;
             }
-            if (!rule.onlyIfBootIds().isEmpty()) {
-                if (rule.skipIfBootIds().contains(bootInfo.bootId())) continue;
+            if (!rule.skipIfBootIds().isEmpty()) {
+                if (bootInfo.containsAll(rule.skipIfBootIds())) continue;
             }
             triggerRule(rule, world, pos, block);
             return;
         }
     }
 
-
-    record BootInfo(Identifier bootId, Set<Identifier> enchantments) {}
-
-    private static final BootInfo BAREFOOT = new BootInfo(new Identifier("minecraft:none"), Collections.emptySet());
-
+    private static final Set<Identifier> BAREFOOT = ImmutableSet.of(new Identifier("minecraft:none"));
 
     /**
      * Return info for the boots the player is wearing.
      */
-    private static BootInfo getBootInfo(Entity entity) {
+    private static Set getBootInfo(Entity entity) {
         for (ItemStack armor : entity.getArmorItems()) {
-            final BootInfo bootInfo = getBootInfo(armor);
+            final Set<Identifier> bootInfo = getBootInfo(armor);
             if (bootInfo != null) return bootInfo;
         }
         return BAREFOOT;
@@ -148,23 +145,24 @@ public class FootpathsService {
         /**
          * Return info about the footwear in the given stack, or null if it isn't footwear.
          */
-    private static BootInfo getBootInfo(ItemStack stack) {
+    private static Set<Identifier> getBootInfo(ItemStack stack) {
         if (!(stack.getItem() instanceof final ArmorItem armor)) return null;
         if (armor.getSlotType() != EquipmentSlot.FEET) return null;
         final Identifier bootId = Registry.ITEM.getId(stack.getItem());
         final NbtList enchants = stack.getEnchantments();
         if (enchants == null || enchants.isEmpty()) {
-            return new BootInfo(bootId, null);
+            return ImmutableSet.of(bootId);
         } else {
-            final Set<Identifier> enchantIds = new HashSet<>();
+            final Set<Identifier> bootInfo = new HashSet<>();
+            bootInfo.add(bootId);
             for (final NbtElement enchant : enchants) {
                 if (enchant instanceof final NbtCompound compound) {
                     final String id = requireNonNull(compound.getString("id"));
                     // final int lvl = compound.getInt("lvl"); TODO someday?
-                    enchantIds.add(new Identifier(id));
+                    bootInfo.add(new Identifier(id));
                 }
             }
-            return new BootInfo(bootId, enchantIds);
+            return bootInfo;
         }
     }
 
