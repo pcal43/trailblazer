@@ -92,18 +92,18 @@ public class FootpathsInitializer implements ModInitializer {
     private static FootpathsRuntimeConfig loadConfig(GsonModConfig config) {
         requireNonNull(config);
         final ImmutableList.Builder<Rule> builder = ImmutableList.builder();
-        for (final GsonRuleConfig gsonBlock : config.rules) {
+        for (int i=0; i < config.rules.size(); i++) {
+            final GsonRuleConfig gsonRule = config.rules.get(i);
             final Rule rule = new Rule(
-                    new Identifier(requireNonNull(gsonBlock.blockId)),
-                    new Identifier(requireNonNull(gsonBlock.nextBlockId)),
-                    gsonBlock.stepCount != null ? gsonBlock.stepCount : DEFAULT_STEP_COUNT,
-                    gsonBlock.timeoutTicks != null ? gsonBlock.timeoutTicks : DEFAULT_TIMEOUT_TICKS,
-                    gsonBlock.entityIds != null ? toIdentifierSet(gsonBlock.entityIds) : DEFAULT_ENTITY_IDS,
-                    toSpawnGroupList(gsonBlock.spawnGroups),
-                    toIdentifierSet(gsonBlock.skipIfBootIds),
-                    toIdentifierSet(gsonBlock.skipIfBootNbts),
-                    toIdentifierSet(gsonBlock.onlyIfBootIds),
-                    toIdentifierSet(gsonBlock.onlyIfBootNbts)
+                    gsonRule.name != null ? gsonRule.name : "rule-"+i,
+                    new Identifier(requireNonNull(gsonRule.blockId)),
+                    new Identifier(requireNonNull(gsonRule.nextBlockId)),
+                    gsonRule.stepCount != null ? gsonRule.stepCount : DEFAULT_STEP_COUNT,
+                    gsonRule.timeoutTicks != null ? gsonRule.timeoutTicks : DEFAULT_TIMEOUT_TICKS,
+                    gsonRule.entityIds != null ? toIdentifierSet(gsonRule.entityIds) : DEFAULT_ENTITY_IDS,
+                    toSpawnGroupList(gsonRule.spawnGroups),
+                    toIdentifierSet(gsonRule.skipIfBootIds),
+                    toIdentifierSet(gsonRule.onlyIfBootIds)
             );
             builder.add(rule);
         }
@@ -137,22 +137,21 @@ public class FootpathsInitializer implements ModInitializer {
     }
 
     // ===================================================================================
-    // Gson model
+    // Gson bindings
 
     public static class GsonModConfig {
-        public List<GsonRuleConfig> rules;
+        List<GsonRuleConfig> rules;
     }
 
     public static class GsonRuleConfig {
-        public String blockId;
-        public String nextBlockId;
+        String name;
+        String blockId;
+        String nextBlockId;
         Integer timeoutTicks;
         Integer stepCount;
         List<String> entityIds;
         List<String> spawnGroups;
         List<String> onlyIfBootIds;
-        List<String> onlyIfBootNbts;
         List<String> skipIfBootIds;
-        List<String> skipIfBootNbts;
     }
 }

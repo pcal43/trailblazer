@@ -120,14 +120,8 @@ public class FootpathsService {
             if (!rule.onlyIfBootIds().isEmpty()) {
                 if (!rule.onlyIfBootIds().contains(bootInfo.bootId())) continue;
             }
-            if (!rule.skipIfBootNbts().isEmpty()) {
-                if (rule.skipIfBootNbts().containsAll(bootInfo.enchantments())) continue;
-            }
             if (!rule.onlyIfBootIds().isEmpty()) {
                 if (rule.skipIfBootIds().contains(bootInfo.bootId())) continue;
-            }
-            if (!rule.onlyIfBootNbts().isEmpty()) {
-                if (!rule.onlyIfBootNbts().containsAll(bootInfo.enchantments())) continue;
             }
             triggerRule(rule, world, pos, block);
             return;

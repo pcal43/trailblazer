@@ -30,10 +30,6 @@ class FootpathsRuntimeConfig {
         }
     }
 
-    List<Rule> getAllRules() {
-        return this.rules;
-    }
-
     List<Rule> getRuleListForBlock(Identifier blockId) {
         return this.rulesPerBlock.get(blockId);
     }
@@ -55,6 +51,7 @@ class FootpathsRuntimeConfig {
     }
 
     record Rule(
+            String name,
             Identifier blockId,
             Identifier nextId,
             int stepCount,
@@ -62,12 +59,11 @@ class FootpathsRuntimeConfig {
             Set<Identifier> entityIds,
             Set<SpawnGroup> spawnGroups,
             Set<Identifier> skipIfBootIds,
-            Set<Identifier> skipIfBootNbts,
-            Set<Identifier> onlyIfBootIds,
-            Set<Identifier> onlyIfBootNbts
+            Set<Identifier> onlyIfBootIds
     ) {
 
         Rule(
+                String name,
                 Identifier blockId,
                 Identifier nextId,
                 int stepCount,
@@ -75,9 +71,8 @@ class FootpathsRuntimeConfig {
                 Set<Identifier> entityIds,
                 Set<SpawnGroup> spawnGroups,
                 Set<Identifier> skipIfBootIds,
-                Set<Identifier> skipIfBootNbts,
-                Set<Identifier> onlyIfBootIds,
-                Set<Identifier> onlyIfBootNbts) {
+                Set<Identifier> onlyIfBootIds) {
+            this.name = name != null ? name : "unnamed";
             this.blockId = requireNonNull(blockId);
             this.nextId = requireNonNull(nextId);
             this.stepCount = stepCount;
@@ -85,15 +80,14 @@ class FootpathsRuntimeConfig {
             this.entityIds = emptySetIfNull(entityIds);
             this.spawnGroups = emptySetIfNull(spawnGroups);
             this.skipIfBootIds = emptySetIfNull(skipIfBootIds);
-            this.skipIfBootNbts = emptySetIfNull(skipIfBootNbts);
             this.onlyIfBootIds = emptySetIfNull(onlyIfBootIds);
-            this.onlyIfBootNbts = emptySetIfNull(onlyIfBootNbts);
+            if (this.skipIfBootIds.isEmpty() && !this.onlyIfBootIds.isEmpty()) {
+                throw new RuntimeException("Rules can't set both skipIfBootIds and onlyIfBootIds");
+            }
         }
 
         private static <T> Set<T> emptySetIfNull(Set<T> set) {
             return set == null ? Collections.emptySet() : set;
         }
     }
-
-
 }

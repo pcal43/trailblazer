@@ -20,6 +20,9 @@
 //
 // Fields:
 //
+//     name:
+//         A name for the rule.  Mainly useful for debugging.  Optional.
+//
 //     bootId:
 //         bootId of a block to track.  This is required.
 //             Example: 'minecraft:gravel'
@@ -49,25 +52,19 @@
 //             Default: [ ]
 //
 //     skipIfBootIds:
-//         List of boot ids for which the footpaths effect will be disabled.  The configured
-//         block transform will not occur if the player is wearing one of the boot types in the list.
-//             Example: [ 'minecraft:leather_boots' ]
+//         Use this to allow players to wear special boots that disable block changes.
+//         If the player is wearing ALL of the listed boots and/or boot enchantments, the
+//         rule will be skipped.
+//             Example: [ 'minecraft:leather_boots', 'minecraft:feather_falling' ]
 //             Default: [ ]
 //
-//     skipIfBootNbts: List of enchantments for which the footpaths effect will be disabled.  The
-//         configured transform will not occur if the player's equipped boots have ALL of the
-//         given enchants.  (Use multiple rules if you need 'this OR that' enchantment).
-//             Example: [ 'minecraft:frost_walker', 'minecraft:thorns' ]
+//     onlyIfBootIds:
+//         Use this to allow players to wear special boots that activate block changes.
+//         The rule will be activated only if the player is wearing ALL of the listed boots
+//         and/or boot enchantments.
+//             Example: [ 'minecraft:netherite_boots', 'minecraft:frost_walker' ]
 //             Default: [ ]
-//
-//     onlyIfBootIds: Like skipBootsId except that the effect will trigger ONLY when the player is
-//         wearing the given boots.  onlyIfBootIds and skipIfBootIds cannot be set together.
-//             Default: [ ]
-//
-//     onlyIfBootNbts: Like skipBootsNbt except that the effect will trigger ONLY when the player is
-//         wearing the boots with all of the listed enchantments.  onlyIfBootNbts and skipIfBootNbts
-//         cannot be set together.
-//             Default: [ ]
+
 //
 // Note that boot-related settings are ignored unless entityIds includes 'minecraft:player'.
 //
@@ -100,45 +97,37 @@
 // Other stuff you can try
 //
 
-//
-// Fire Walker Boots
 // {
+//  'name'           : 'Firewalker Boots'
 //  'bootId'         : 'minecraft:lava',
 //  'nextId'         : 'minecraft:cobblestone',
-//  'onlyIfBootIds'  : [ 'minecraft:netherite_boots' ],
-//  'onlyIfBootNbts' : [ 'minecraft:frost_walker' ],
+//  'onlyIfBootIds'  : [ 'minecraft:netherite_boots' , 'minecraft:frost_walker' ],
 // }
 
-//
-// No Shoes On the Grass
 // {
+//  'name'           : 'No Shoes on the Grass, Please'
 //  'bootId'         : 'minecraft:grass',
 //  'nextId'         : 'minecraft:dirt',
 //  'skipIfBootIds'  : [ 'minecraft:none' ],
 // }
 
-//
-// Creeper Trails
 // {
+//  'name'           : 'Creeper Trails'
 //  'bootId'         : 'minecraft:grass_block',
 //  'nextId'         : 'minecraft:slime_block',
 //  'entityIds'      : [ 'minecraft:creeper' ],
 // }
 
-//
-// King Midas' Shoes
 // {
+//  'name'           : 'King Midas Shoes'
 //  'bootId'         : 'minecraft:andesite_block',
 //  'nextId'         : 'minecraft:gold_block',
 //  'onlyIfBootIds'  : [ 'minecraft:golden_boots' ],
 // }
 
-//
-// Boom Boots!
 // {
+//  'name'           : 'Boom Boots!'
 //  'bootId'         : 'minecraft:lava',
 //  'nextId'         : 'minecraft:tnt',
-//  'onlyIfBootIds'  : [ 'minecraft:chainmail_boots' ],
-//  'onlyIfBootNbts' : [ 'minecraft:fire_protection' ],
+//  'onlyIfBootIds'  : [ 'minecraft:chainmail_boots',  'minecraft:fire_protection' ],
 // }
-
