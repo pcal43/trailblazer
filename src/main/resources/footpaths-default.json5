@@ -35,7 +35,8 @@
 //     timeoutTicks:
 //         The maximum number of ticks that can elapse between steps in order for a step to
 //         advance the stepCount counter.  1 tick = 0.05 seconds.  -1 means 'never timeout'
-//             Default: 72000
+//         Ignored if stepCount is 0.
+//             Default: 72000 (one hour)
 //
 //     entityIds:
 //         List of EntityType ids for entities whose footsteps trigger the rule.
@@ -45,19 +46,19 @@
 //     spawnGroups:
 //         List of SpawnGroup names for entities whose footsteps will trigger the rule.
 //             Example: [ 'monster', 'creature', 'ambient' ]
-//             Default: []
+//             Default: [ ]
 //
 //     skipIfBootIds:
 //         List of boot ids for which the footpaths effect will be disabled.  The configured
 //         block transform will not occur if the player is wearing one of the boot types in the list.
 //             Example: [ 'minecraft:leather_boots' ]
-//             Default: []
+//             Default: [ ]
 //
 //     skipIfBootNbts: List of enchantments for which the footpaths effect will be disabled.  The
 //         configured transform will not occur if the player's equipped boots have ALL of the
 //         given enchants.  (Use multiple rules if you need 'this OR that' enchantment).
 //             Example: [ 'minecraft:frost_walker', 'minecraft:thorns' ]
-//             Default: [ 'minecraft:feather_falling' ]
+//             Default: [ ]
 //
 //     onlyIfBootIds: Like skipBootsId except that the effect will trigger ONLY when the player is
 //         wearing the given boots.  onlyIfBootIds and skipIfBootIds cannot be set together.
@@ -76,18 +77,18 @@
     {
       'blockId'       : 'minecraft:grass_block',
       'nextBlockId'   : 'minecraft:dirt',
-      'stepCount'     : 0,
+      'stepCount'     : 0
     },
     {
       'blockId'       : 'minecraft:dirt',
       'nextBlockId'   : 'minecraft:coarse_dirt',
-      'stepCount'     : 3,
+      'stepCount'     : 3
     },
     {
       'blockId'       : 'minecraft:coarse_dirt',
       'nextBlockId'   : 'minecraft:dirt_path',
-      'stepCount'     : 3,
-    },
+      'stepCount'     : 3
+    }
   ]
 }
 

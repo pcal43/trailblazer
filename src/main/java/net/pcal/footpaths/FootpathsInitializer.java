@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,10 @@ public class FootpathsInitializer implements ModInitializer {
 
     private static final Path CUSTOM_CONFIG_PATH = Paths.get("config", "footpaths.json5");
     private static final Path DEFAULT_CONFIG_PATH = Paths.get("config", "footpaths-default.json5");
+    private static final Set<Identifier> DEFAULT_ENTITY_IDS = ImmutableSet.of(new Identifier("minecraft:player"));
     private static final String CONFIG_RESOURCE_NAME = "footpaths-default.json5";
+    public static final int DEFAULT_STEP_COUNT = 0;
+    public static final int DEFAULT_TIMEOUT_TICKS = 72000;
 
     // ===================================================================================
     // ModInitializer implementation
@@ -92,9 +96,9 @@ public class FootpathsInitializer implements ModInitializer {
             final Rule rule = new Rule(
                     new Identifier(requireNonNull(gsonBlock.blockId)),
                     new Identifier(requireNonNull(gsonBlock.nextBlockId)),
-                    requireNonNull(gsonBlock.stepCount),
-                    requireNonNull(gsonBlock.timeoutTicks),
-                    toIdentifierSet(gsonBlock.entityIds),
+                    gsonBlock.stepCount != null ? gsonBlock.stepCount : DEFAULT_STEP_COUNT,
+                    gsonBlock.timeoutTicks != null ? gsonBlock.timeoutTicks : DEFAULT_TIMEOUT_TICKS,
+                    gsonBlock.entityIds != null ? toIdentifierSet(gsonBlock.entityIds) : DEFAULT_ENTITY_IDS,
                     toSpawnGroupList(gsonBlock.spawnGroups),
                     toIdentifierSet(gsonBlock.skipIfBootIds),
                     toIdentifierSet(gsonBlock.skipIfBootNbts),
@@ -107,6 +111,7 @@ public class FootpathsInitializer implements ModInitializer {
     }
 
     private static Set<Identifier> toIdentifierSet(List<String> rawIds) {
+        if (rawIds == null) return Collections.emptySet();
         final ImmutableSet.Builder<Identifier> builder = ImmutableSet.builder();
         for (String rawId : rawIds) {
             builder.add(new Identifier(rawId));
