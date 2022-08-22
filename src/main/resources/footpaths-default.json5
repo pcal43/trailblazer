@@ -77,16 +77,19 @@
     {
       'blockId'       : 'minecraft:grass_block',
       'nextBlockId'   : 'minecraft:dirt',
+      'skipIfBootIds' : [ 'minecraft:feather_falling' ],
       'stepCount'     : 0
     },
     {
       'blockId'       : 'minecraft:dirt',
       'nextBlockId'   : 'minecraft:coarse_dirt',
+      'skipIfBootIds' : [ 'minecraft:feather_falling' ],
       'stepCount'     : 3
     },
     {
       'blockId'       : 'minecraft:coarse_dirt',
       'nextBlockId'   : 'minecraft:dirt_path',
+      'skipIfBootIds' : [ 'minecraft:feather_falling' ],
       'stepCount'     : 3
     }
   ]

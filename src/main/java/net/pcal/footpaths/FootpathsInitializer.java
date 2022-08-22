@@ -120,6 +120,7 @@ public class FootpathsInitializer implements ModInitializer {
     }
 
     private static Set<SpawnGroup> toSpawnGroupList(Iterable<String> rawIds) {
+        if (rawIds == null) return Collections.emptySet();
         final ImmutableSet.Builder<SpawnGroup> builder = ImmutableSet.builder();
         rawIds.forEach(sg -> builder.add(SpawnGroup.valueOf(sg)));
         return builder.build();
