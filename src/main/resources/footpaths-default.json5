@@ -72,21 +72,21 @@
 //
 
 {
-  'blocks': [
+  'rules': [
     {
-      'id'       : 'minecraft:grass_block',
-      'nextId'   : 'minecraft:dirt',
-      'stepCount': 0,
+      'blockId'       : 'minecraft:grass_block',
+      'nextBlockId'   : 'minecraft:dirt',
+      'stepCount'     : 0,
     },
     {
-      'id'       : 'minecraft:dirt',
-      'nextId'   : 'minecraft:coarse_dirt',
-      'stepCount': 3,
+      'blockId'       : 'minecraft:dirt',
+      'nextBlockId'   : 'minecraft:coarse_dirt',
+      'stepCount'     : 3,
     },
     {
-      'id'       : 'minecraft:coarse_dirt',
-      'nextId'   : 'minecraft:dirt_path',
-      'stepCount': 3,
+      'blockId'       : 'minecraft:coarse_dirt',
+      'nextBlockId'   : 'minecraft:dirt_path',
+      'stepCount'     : 3,
     },
   ]
 }
