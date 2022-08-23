@@ -24,11 +24,11 @@
 //         A name for the rule.  Mainly useful for debugging.  Optional.
 //
 //     bootId:
-//         bootId of a block to track.  This is required.
+//         id of a block to track.  This is required.
 //             Example: 'minecraft:gravel'
 //
-//     nextId:
-//        bootId of the block to change the block into.  This is required.
+//     nextBlockId:
+//        id of the block to change the block into.  This is required.
 //             Example: 'minecraft:cobblestone'
 //
 //     stepCount:
@@ -52,21 +52,24 @@
 //             Default: [ ]
 //
 //     skipIfBootIds:
-//         Use this to allow players to wear special boots that disable block changes.
-//         If the player is wearing ALL of the listed boots and/or boot enchantments, the
-//         rule will be skipped.
-//             Example: [ 'minecraft:leather_boots', 'minecraft:feather_falling' ]
+//         A List-of-lists of boot and/or enchantment ids.  If the player is wearing ALL of the boots
+//         and/or boot enchantments in one of the sublists, the rule will NOT trigger.  Use this to allow
+//         players to wear special boots that disable block changes.
+//             Example: [  ['minecraft:leather_boots'], [ 'minecraft:golden_boots', 'minecraft:feather_falling'] ]
 //             Default: [ ]
 //
 //     onlyIfBootIds:
-//         Use this to allow players to wear special boots that activate block changes.
-//         The rule will be activated only if the player is wearing ALL of the listed boots
-//         and/or boot enchantments.
-//             Example: [ 'minecraft:netherite_boots', 'minecraft:frost_walker' ]
+//         Just like skipIfBootIds except the rule will ONLY trigger if the player is wearing boots that
+//         match one of the sublists.  Use this to have block changes that happen only when players are wearing
+//         special boots.
+//             Example: [ [ 'minecraft:diamond_boots', 'minecraft:frost_walker'], [ 'minecraft:netherite_boots', 'minecraft:frost_walker'],  ]
 //             Default: [ ]
-
 //
-// Note that boot-related settings are ignored unless entityIds includes 'minecraft:player'.
+//
+// Notes about boot rules:
+// * A rule cannot specify both skipIfBootIds and onlyIfBootIds.
+// * Use 'minecraft:none' to match players going barefoot.
+// * Boot rules DO apply to mobs tht can wear boots.
 //
 
 {
@@ -75,23 +78,33 @@
       'name'          : 'grass to dirt (unless barefoot or boots with feather falling)',
       'blockId'       : 'minecraft:grass_block',
       'nextBlockId'   : 'minecraft:dirt',
-      'skipIfBootIds' : [[ 'minecraft:feather_falling' ], [ 'minecraft:none' ]],
+      'entityIds'     : [ 'minecraft:zombie', 'minecraft:player' ],
+      'skipIfBootIds' : [[ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ],
       'stepCount'     : 0
     },
     {
       'name'          : 'dirt to coarse dirt',
       'blockId'       : 'minecraft:dirt',
       'nextBlockId'   : 'minecraft:coarse_dirt',
-      'skipIfBootIds' : [[ 'minecraft:feather_falling' ], [ 'minecraft:none' ]],
+      'entityIds'     : [ 'minecraft:zombie', 'minecraft:player' ],
+      'skipIfBootIds' : [ [ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ],
       'stepCount'     : 3
     },
     {
       'name'          : 'coarse dirt to dirt path',
       'blockId'       : 'minecraft:coarse_dirt',
+      'entityIds'     : [ 'minecraft:zombie', 'minecraft:player' ],
       'nextBlockId'   : 'minecraft:dirt_path',
-      'skipIfBootIds' : [[ 'minecraft:feather_falling' ], [ 'minecraft:none' ]],
+      'skipIfBootIds' : [ [ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ],
       'stepCount'     : 3
+    },
+    {
+      'name': 'This is bad',
+      'blockId': 'minecraft:grass_block',
+      'nextBlockId': 'minecraft:tnt',
+      'entityIds': [ 'minecraft:creeper' ]
     }
+
   ]
 }
 
@@ -102,35 +115,42 @@
 
 // {
 //  'name'           : 'Firewalker Boots'
-//  'bootId'         : 'minecraft:lava',
+//  'blockId'        : 'minecraft:lava',
 //  'nextId'         : 'minecraft:cobblestone',
 //  'onlyIfBootIds'  : [[ 'minecraft:netherite_boots' , 'minecraft:frost_walker' ]],
 // }
 
 // {
 //  'name'           : 'No Shoes on the Grass, Please'
-//  'bootId'         : 'minecraft:grass',
-//  'nextId'         : 'minecraft:dirt',
+//  'blockId'        : 'minecraft:grass',
+//  'nextBlockId'    : 'minecraft:dirt',
 //  'skipIfBootIds'  : [[ 'minecraft:none' ], [ 'minecraft:feather_falling' ]]
 // }
 
 // {
-//  'name'           : 'Creeper Trails'
-//  'bootId'         : 'minecraft:grass_block',
-//  'nextId'         : 'minecraft:slime_block',
+//  'name'           : 'Slime Trails'
+//  'blockId'        : 'minecraft:grass_block',
+//  'nextBlockId'    : 'minecraft:slime_block',
+//  'entityIds'      : [ 'minecraft:zombie' ],
+// }
+
+// {
+//  'name'           : 'This is bad'
+//  'blockId'        : 'minecraft:grass_block',
+//  'nextBlockId'    : 'minecraft:tnt',
 //  'entityIds'      : [ 'minecraft:creeper' ],
 // }
 
 // {
 //  'name'           : 'King Midas Shoes'
-//  'bootId'         : 'minecraft:andesite_block',
-//  'nextId'         : 'minecraft:gold_block',
+//  'blockId'        : 'minecraft:andesite_block',
+//  'nextBlockId'    : 'minecraft:gold_block',
 //  'onlyIfBootIds'  : [[ 'minecraft:golden_boots' ]],
 // }
 
 // {
 //  'name'           : 'Boom Boots!'
-//  'bootId'         : 'minecraft:lava',
-//  'nextId'         : 'minecraft:tnt',
+//  'blockId'        : 'minecraft:lava',
+//  'nextBlockId'    : 'minecraft:tnt',
 //  'onlyIfBootIds'  : [[ 'minecraft:chainmail_boots',  'minecraft:fire_protection' ]],
 // }
