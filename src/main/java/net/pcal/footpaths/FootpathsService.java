@@ -119,15 +119,23 @@ public class FootpathsService {
             if (!blockId.equals(rule.blockId())) continue;
             if (!entityRuleSet.contains(rule)) continue;
             if (!rule.onlyIfBootIds().isEmpty()) {
-                if (!bootInfo.containsAll(rule.onlyIfBootIds())) continue;
+                if (!matchesAny(bootInfo, rule.onlyIfBootIds())) continue;
             }
             if (!rule.skipIfBootIds().isEmpty()) {
-                if (bootInfo.containsAll(rule.skipIfBootIds())) continue;
+                if (matchesAny(bootInfo, rule.skipIfBootIds())) continue;
             }
             triggerRule(rule, world, pos, block);
             return;
         }
     }
+
+    private static boolean matchesAny(Set<Identifier> bootInfo, List<Set<Identifier>> setList) {
+        for (final Set<Identifier> set : setList) {
+            if (bootInfo.containsAll(set)) return true;
+        }
+        return false;
+    }
+
 
     private static final Set<Identifier> BAREFOOT = ImmutableSet.of(new Identifier("minecraft:none"));
 

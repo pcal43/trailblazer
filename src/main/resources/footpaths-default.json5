@@ -72,21 +72,24 @@
 {
   'rules': [
     {
+      'name'          : 'grass to dirt (unless barefoot or boots with feather falling)',
       'blockId'       : 'minecraft:grass_block',
       'nextBlockId'   : 'minecraft:dirt',
-      'skipIfBootIds' : [ 'minecraft:feather_falling' ],
+      'skipIfBootIds' : [[ 'minecraft:feather_falling' ], [ 'minecraft:none' ]],
       'stepCount'     : 0
     },
     {
+      'name'          : 'dirt to coarse dirt',
       'blockId'       : 'minecraft:dirt',
       'nextBlockId'   : 'minecraft:coarse_dirt',
-      'skipIfBootIds' : [ 'minecraft:feather_falling' ],
+      'skipIfBootIds' : [[ 'minecraft:feather_falling' ], [ 'minecraft:none' ]],
       'stepCount'     : 3
     },
     {
+      'name'          : 'coarse dirt to dirt path',
       'blockId'       : 'minecraft:coarse_dirt',
       'nextBlockId'   : 'minecraft:dirt_path',
-      'skipIfBootIds' : [ 'minecraft:feather_falling' ],
+      'skipIfBootIds' : [[ 'minecraft:feather_falling' ], [ 'minecraft:none' ]],
       'stepCount'     : 3
     }
   ]
@@ -101,14 +104,14 @@
 //  'name'           : 'Firewalker Boots'
 //  'bootId'         : 'minecraft:lava',
 //  'nextId'         : 'minecraft:cobblestone',
-//  'onlyIfBootIds'  : [ 'minecraft:netherite_boots' , 'minecraft:frost_walker' ],
+//  'onlyIfBootIds'  : [[ 'minecraft:netherite_boots' , 'minecraft:frost_walker' ]],
 // }
 
 // {
 //  'name'           : 'No Shoes on the Grass, Please'
 //  'bootId'         : 'minecraft:grass',
 //  'nextId'         : 'minecraft:dirt',
-//  'skipIfBootIds'  : [ 'minecraft:none' ],
+//  'skipIfBootIds'  : [[ 'minecraft:none' ], [ 'minecraft:feather_falling' ]]
 // }
 
 // {
@@ -122,12 +125,12 @@
 //  'name'           : 'King Midas Shoes'
 //  'bootId'         : 'minecraft:andesite_block',
 //  'nextId'         : 'minecraft:gold_block',
-//  'onlyIfBootIds'  : [ 'minecraft:golden_boots' ],
+//  'onlyIfBootIds'  : [[ 'minecraft:golden_boots' ]],
 // }
 
 // {
 //  'name'           : 'Boom Boots!'
 //  'bootId'         : 'minecraft:lava',
 //  'nextId'         : 'minecraft:tnt',
-//  'onlyIfBootIds'  : [ 'minecraft:chainmail_boots',  'minecraft:fire_protection' ],
+//  'onlyIfBootIds'  : [[ 'minecraft:chainmail_boots',  'minecraft:fire_protection' ]],
 // }

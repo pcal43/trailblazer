@@ -2,6 +2,7 @@ package net.pcal.footpaths;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multiset;
 import com.google.gson.Gson;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.SpawnGroup;
@@ -102,8 +103,8 @@ public class FootpathsInitializer implements ModInitializer {
                     gsonRule.timeoutTicks != null ? gsonRule.timeoutTicks : DEFAULT_TIMEOUT_TICKS,
                     gsonRule.entityIds != null ? toIdentifierSet(gsonRule.entityIds) : DEFAULT_ENTITY_IDS,
                     toSpawnGroupList(gsonRule.spawnGroups),
-                    toIdentifierSet(gsonRule.skipIfBootIds),
-                    toIdentifierSet(gsonRule.onlyIfBootIds)
+                    toIdentifierSetList(gsonRule.skipIfBootIds),
+                    toIdentifierSetList(gsonRule.onlyIfBootIds)
             );
             builder.add(rule);
         }
@@ -115,6 +116,15 @@ public class FootpathsInitializer implements ModInitializer {
         final ImmutableSet.Builder<Identifier> builder = ImmutableSet.builder();
         for (String rawId : rawIds) {
             builder.add(new Identifier(rawId));
+        }
+        return builder.build();
+    }
+
+    private static List<Set<Identifier>> toIdentifierSetList(List<List<String>> rawIdLists) {
+        if (rawIdLists == null) return Collections.emptyList();
+        final ImmutableList.Builder<Set<Identifier>> builder = ImmutableList.builder();
+        for (List<String> rawIdList : rawIdLists) {
+            builder.add(toIdentifierSet(rawIdList));
         }
         return builder.build();
     }
@@ -151,7 +161,7 @@ public class FootpathsInitializer implements ModInitializer {
         Integer stepCount;
         List<String> entityIds;
         List<String> spawnGroups;
-        List<String> onlyIfBootIds;
-        List<String> skipIfBootIds;
+        List<List<String>> onlyIfBootIds;
+        List<List<String>> skipIfBootIds;
     }
 }

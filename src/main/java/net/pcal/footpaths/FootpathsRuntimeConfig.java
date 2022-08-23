@@ -58,8 +58,8 @@ class FootpathsRuntimeConfig {
             int timeoutTicks,
             Set<Identifier> entityIds,
             Set<SpawnGroup> spawnGroups,
-            Set<Identifier> skipIfBootIds,
-            Set<Identifier> onlyIfBootIds
+            List<Set<Identifier>> skipIfBootIds,
+            List<Set<Identifier>> onlyIfBootIds
     ) {
 
         Rule(
@@ -70,8 +70,8 @@ class FootpathsRuntimeConfig {
                 int timeoutTicks,
                 Set<Identifier> entityIds,
                 Set<SpawnGroup> spawnGroups,
-                Set<Identifier> skipIfBootIds,
-                Set<Identifier> onlyIfBootIds) {
+                List<Set<Identifier>> skipIfBootIds,
+                List<Set<Identifier>> onlyIfBootIds) {
             this.name = name != null ? name : "unnamed";
             this.blockId = requireNonNull(blockId);
             this.nextId = requireNonNull(nextId);
@@ -79,8 +79,8 @@ class FootpathsRuntimeConfig {
             this.timeoutTicks = timeoutTicks;
             this.entityIds = emptySetIfNull(entityIds);
             this.spawnGroups = emptySetIfNull(spawnGroups);
-            this.skipIfBootIds = emptySetIfNull(skipIfBootIds);
-            this.onlyIfBootIds = emptySetIfNull(onlyIfBootIds);
+            this.skipIfBootIds = emptyLiotIfNull(skipIfBootIds);
+            this.onlyIfBootIds = emptyLiotIfNull(onlyIfBootIds);
             if (this.skipIfBootIds.isEmpty() && !this.onlyIfBootIds.isEmpty()) {
                 throw new RuntimeException("Rules can't set both skipIfBootIds and onlyIfBootIds");
             }
@@ -88,6 +88,10 @@ class FootpathsRuntimeConfig {
 
         private static <T> Set<T> emptySetIfNull(Set<T> set) {
             return set == null ? Collections.emptySet() : set;
+        }
+
+        private static <T> List<T> emptyLiotIfNull(List<T> list) {
+            return list == null ? Collections.emptyList() : list;
         }
     }
 }
