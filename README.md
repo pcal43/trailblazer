@@ -1,20 +1,30 @@
 # Trailblazer
 
 Trailblazer is a Fabric minecraft mod that changes blocks as they are walked on.  
-By default, grass blocks will change to dirt blocks and then to paths.
+
+By default, the mod enables two trailblazing effects:
+
+**Dirt Trails.**  As players and zombies walk on grass blocks, the grass will change to dirt and then to paths - *unless* you're going barefoot or wearing boots with Feather Falling.
+
+**Firewalker Boots.**  If you're wearing Netherite Boots enchanted with Fire Protection and Frost Walker, Lava blocks will change to cobblestone as you walk on them.
  
+ 
+These effects are fully customizable - you can modify them or even create brand new effects.
+
+
 ## Features
-* Vanilla-friendly.  Does NOT add any new blocks to your server.
+* Does NOT add any new blocks to your world.  
+* Does NOT have to be installed on the client
 * Fully customizable
 * Mobs and players can leave trails
+* Trails can be enabled or disabled depending on boots/enchants being worn
 * Use whatever blocks you want
 
-## Configuration
+## Customization
 
 To configure the mod, follow the instructions in the default config file:
 
 https://github.com/pcal43/trailblazer/blob/main/src/main/resources/trailblazer-default.json5
-
 
 
 ## Legal
