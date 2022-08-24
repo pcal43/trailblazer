@@ -79,14 +79,14 @@
       'blockId'       : 'minecraft:grass_block',
       'nextBlockId'   : 'minecraft:dirt',
       'entityIds'     : [ 'minecraft:zombie','minecraft:player' ],
-      'skipIfBoots' : [ [ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ]
+      'skipIfBoots'   : [ [ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ]
     },
     {
       'name'          : 'Dirt to coarse dirt',
       'blockId'       : 'minecraft:dirt',
       'nextBlockId'   : 'minecraft:coarse_dirt',
       'entityIds'     : [ 'minecraft:zombie', 'minecraft:player' ],
-      'skipIfBoots' : [ [ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ],
+      'skipIfBoots'   : [ [ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ],
       'stepCount'     : 3
     },
     {
@@ -94,14 +94,14 @@
       'blockId'       : 'minecraft:coarse_dirt',
       'entityIds'     : [ 'minecraft:zombie', 'minecraft:player' ],
       'nextBlockId'   : 'minecraft:dirt_path',
-      'skipIfBoots' : [ [ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ],
+      'skipIfBoots'   : [ [ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ],
       'stepCount'     : 3
     },
     {
       'name'           : 'Firewalker Boots',
       'blockId'        : 'minecraft:lava',
       'nextBlockId'    : 'minecraft:cobblestone',
-      'onlyIfBoots'  : [ [ 'minecraft:netherite_boots' , 'minecraft:frost_walker', 'minecraft:fire_protection' ] ]
+      'onlyIfBoots'    : [ [ 'minecraft:netherite_boots' , 'minecraft:frost_walker', 'minecraft:fire_protection' ] ]
     }
   ]
 }
