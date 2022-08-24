@@ -97,14 +97,7 @@
       'nextBlockId'   : 'minecraft:dirt_path',
       'skipIfBootIds' : [ [ 'minecraft:feather_falling' ], [ 'minecraft:none' ] ],
       'stepCount'     : 3
-    },
-    {
-      'name': 'This is bad',
-      'blockId': 'minecraft:grass_block',
-      'nextBlockId': 'minecraft:tnt',
-      'entityIds': [ 'minecraft:creeper' ]
     }
-
   ]
 }
 
