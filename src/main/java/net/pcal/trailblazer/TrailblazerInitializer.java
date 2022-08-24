@@ -1,13 +1,12 @@
-package net.pcal.footpaths;
+package net.pcal.trailblazer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multiset;
 import com.google.gson.Gson;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
-import net.pcal.footpaths.FootpathsRuntimeConfig.Rule;
+import net.pcal.trailblazer.TrailblazerRuntimeConfig.Rule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,18 +20,18 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
-import static net.pcal.footpaths.FootpathsService.LOGGER_NAME;
-import static net.pcal.footpaths.FootpathsService.LOG_PREFIX;
+import static net.pcal.trailblazer.TrailblazerService.LOGGER_NAME;
+import static net.pcal.trailblazer.TrailblazerService.LOG_PREFIX;
 
-public class FootpathsInitializer implements ModInitializer {
+public class TrailblazerInitializer implements ModInitializer {
 
     // ===================================================================================
     // Constants
 
-    private static final Path CUSTOM_CONFIG_PATH = Paths.get("config", "footpaths.json5");
-    private static final Path DEFAULT_CONFIG_PATH = Paths.get("config", "footpaths-default.json5");
+    private static final Path CUSTOM_CONFIG_PATH = Paths.get("config", "trailblazer.json5");
+    private static final Path DEFAULT_CONFIG_PATH = Paths.get("config", "trailblazer-default.json5");
     private static final Set<Identifier> DEFAULT_ENTITY_IDS = ImmutableSet.of(new Identifier("minecraft:player"));
-    private static final String CONFIG_RESOURCE_NAME = "footpaths-default.json5";
+    private static final String CONFIG_RESOURCE_NAME = "trailblazer-default.json5";
     public static final int DEFAULT_STEP_COUNT = 0;
     public static final int DEFAULT_TIMEOUT_TICKS = 72000;
 
@@ -57,7 +56,7 @@ public class FootpathsInitializer implements ModInitializer {
         // Load the default configuration from resources and write it as the -default in the installation
         //
         final String defaultConfigResourceRaw;
-        try (InputStream in = FootpathsInitializer.class.getClassLoader().getResourceAsStream(CONFIG_RESOURCE_NAME)) {
+        try (InputStream in = TrailblazerInitializer.class.getClassLoader().getResourceAsStream(CONFIG_RESOURCE_NAME)) {
             if (in == null) {
                 throw new FileNotFoundException("Unable to load resource " + CONFIG_RESOURCE_NAME); // wat
             }
@@ -83,14 +82,14 @@ public class FootpathsInitializer implements ModInitializer {
         //
         final Gson gson = new Gson();
         final GsonModConfig gsonConfig = gson.fromJson(stripComments(effectiveConfigRaw), GsonModConfig.class);
-        FootpathsService.getInstance().configure(loadConfig(gsonConfig));
+        TrailblazerService.getInstance().configure(loadConfig(gsonConfig));
         //
         // All done
         //
         logger.info(LOG_PREFIX + "Initialized" + (isCustomConfig ? " with custom configuration." : "."));
     }
 
-    private static FootpathsRuntimeConfig loadConfig(GsonModConfig config) {
+    private static TrailblazerRuntimeConfig loadConfig(GsonModConfig config) {
         requireNonNull(config);
         final ImmutableList.Builder<Rule> builder = ImmutableList.builder();
         for (int i=0; i < config.rules.size(); i++) {
@@ -108,7 +107,7 @@ public class FootpathsInitializer implements ModInitializer {
             );
             builder.add(rule);
         }
-        return new FootpathsRuntimeConfig(builder.build());
+        return new TrailblazerRuntimeConfig(builder.build());
     }
 
     private static Set<Identifier> toIdentifierSet(List<String> rawIds) {
