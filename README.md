@@ -15,7 +15,7 @@ By default, the mod enables two trailblazing effects:
 * Mobs and players can leave trails
 * Trails can be enabled or disabled depending on boots/enchants being worn
 * Change any block to any other block
-* Can work boots and enchants from any other mod.
+* Can work with boots and enchants from any other mod.
 
 ## Customization
 
