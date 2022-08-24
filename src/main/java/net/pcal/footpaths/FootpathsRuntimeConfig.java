@@ -1,63 +1,97 @@
 package net.pcal.footpaths;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Runtime representation of configuration. FIXME should allow more than one RBC per block id
+ * Runtime representation of configuration. FIXME should allow more than one RBC per block bootId
  */
 @SuppressWarnings("ClassCanBeRecord")
-public class FootpathsRuntimeConfig {
+class FootpathsRuntimeConfig {
 
-    private final Map<Identifier, RuntimeBlockConfig> blocksConfig;
+    private final List<Rule> rules;
+    private final ListMultimap<Identifier, Rule> rulesPerBlock = ArrayListMultimap.create();
+    private final SetMultimap<Identifier, Rule> rulesPerEntity = HashMultimap.create();
+    private final SetMultimap<SpawnGroup, Rule> rulesPerSpawnGroup = HashMultimap.create();
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-
-        private final Map<Identifier, RuntimeBlockConfig> blocksConfig = new HashMap<>();
-
-        public Builder blockConfig(Identifier blockId, RuntimeBlockConfig rbc) {
-            this.blocksConfig.put(blockId, rbc);
-            return this;
-        }
-
-        FootpathsRuntimeConfig build() {
-            return new FootpathsRuntimeConfig(this.blocksConfig);
+    FootpathsRuntimeConfig(List<Rule> rules) {
+        this.rules = requireNonNull(rules);
+        for (final Rule rule : rules) {
+            this.rulesPerBlock.put(rule.blockId(), rule);
+            rule.entityIds().forEach(id -> this.rulesPerEntity.put(id, rule));
+            rule.spawnGroups().forEach(group -> this.rulesPerSpawnGroup.put(group, rule));
         }
     }
 
-    private FootpathsRuntimeConfig(Map<Identifier, RuntimeBlockConfig> blocksConfig) {
-        this.blocksConfig = requireNonNull(blocksConfig);
+    List<Rule> getRuleListForBlock(Identifier blockId) {
+        return this.rulesPerBlock.get(blockId);
     }
 
-    public RuntimeBlockConfig getBlockConfig(Identifier blockId) {
-        return this.blocksConfig.get(blockId);
+    Set<Rule> getRulesForEntity(Entity entity) {
+        final Identifier entityId = Registry.ENTITY_TYPE.getId(entity.getType());
+        if (this.rulesPerSpawnGroup.isEmpty()) {
+            return this.rulesPerEntity.get(entityId);
+        } else {
+            final SpawnGroup spawnGroup = entity.getType().getSpawnGroup();
+            final Set<Rule> spawnGroupRules = this.rulesPerSpawnGroup.get(spawnGroup);
+            if (spawnGroupRules.isEmpty()) {
+                return this.rulesPerEntity.get(entityId);
+            } else {
+                // FIXME? I suppose we could also be build up a cache of these things
+                return Sets.union(this.rulesPerEntity.get(entityId), spawnGroupRules);
+            }
+        }
     }
 
-    public Set<RuntimeBlockConfig> getAllConfigs() {
-        return ImmutableSet.copyOf(this.blocksConfig.values());
-    }
-
-    public boolean hasBlockConfig(Identifier blockId) {
-        return this.blocksConfig.containsKey(blockId);
-    }
-
-    public record RuntimeBlockConfig(
+    record Rule(
+            String name,
+            Identifier blockId,
             Identifier nextId,
             int stepCount,
             int timeoutTicks,
             Set<Identifier> entityIds,
-            Set<String> spawnGroups
-    ) {}
+            Set<SpawnGroup> spawnGroups,
+            List<Set<Identifier>> skipIfBoots,
+            List<Set<Identifier>> onlyIfBoots
+    ) {
 
+        Rule(
+                String name,
+                Identifier blockId,
+                Identifier nextId,
+                int stepCount,
+                int timeoutTicks,
+                Set<Identifier> entityIds,
+                Set<SpawnGroup> spawnGroups,
+                List<Set<Identifier>> skipIfBoots,
+                List<Set<Identifier>> onlyIfBoots) {
+            this.name = name != null ? name : "unnamed";
+            this.blockId = requireNonNull(blockId);
+            this.nextId = requireNonNull(nextId);
+            this.stepCount = stepCount;
+            this.timeoutTicks = timeoutTicks;
+            this.entityIds = emptySetIfNull(entityIds);
+            this.spawnGroups = emptySetIfNull(spawnGroups);
+            this.skipIfBoots = emptyListIfNull(skipIfBoots);
+            this.onlyIfBoots = emptyListIfNull(onlyIfBoots);
+            if (!this.skipIfBoots.isEmpty() && !this.onlyIfBoots.isEmpty()) {
+                throw new RuntimeException("Rules can't set both skipIfBoots and onlyIfBoots");
+            }
+        }
 
+        private static <T> Set<T> emptySetIfNull(Set<T> set) {
+            return set == null ? Collections.emptySet() : set;
+        }
+
+        private static <T> List<T> emptyListIfNull(List<T> list) {
+            return list == null ? Collections.emptyList() : list;
+        }
+    }
 }
