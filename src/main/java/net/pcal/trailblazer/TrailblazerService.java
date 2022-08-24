@@ -33,8 +33,8 @@ public class TrailblazerService {
     // ===================================================================================
     // Constants
 
-    public static final String LOGGER_NAME = "footpaths";
-    public static final String LOG_PREFIX = "[Footpaths] ";
+    public static final String LOGGER_NAME = "trailblazer";
+    public static final String LOG_PREFIX = "[Trailblazer] ";
 
     // ===================================================================================
     // Singleton

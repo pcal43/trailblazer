@@ -28,7 +28,7 @@ public class TrailblazerInitializer implements ModInitializer {
     // ===================================================================================
     // Constants
 
-    private static final Path CUSTOM_CONFIG_PATH = Paths.get("config", "footpaths.json5");
+    private static final Path CUSTOM_CONFIG_PATH = Paths.get("config", "trailblazer.json5");
     private static final Path DEFAULT_CONFIG_PATH = Paths.get("config", "trailblazer-default.json5");
     private static final Set<Identifier> DEFAULT_ENTITY_IDS = ImmutableSet.of(new Identifier("minecraft:player"));
     private static final String CONFIG_RESOURCE_NAME = "trailblazer-default.json5";
