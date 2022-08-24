@@ -59,7 +59,7 @@
 //             Default: [ ]
 //
 //     onlyIfBoots:
-//         Just like skipIfBoots except the rule will ONLY trigger if the player is wearing boots that
+//         Just like skipIfBoots except the rule will trigger ONLY IF the player is wearing boots that
 //         match one of the sublists.  Use this to have block changes that happen only when players are wearing
 //         special boots.
 //             Example: [ [ 'minecraft:diamond_boots', 'minecraft:frost_walker'], [ 'minecraft:netherite_boots', 'minecraft:frost_walker'],  ]
@@ -69,7 +69,7 @@
 // Notes about boot rules:
 // * A rule cannot specify both skipIfBoots and onlyIfBoots.
 // * Use 'minecraft:none' to match players going barefoot.
-// * Boot rules DO apply to mobs tht can wear boots.
+// * Boot rules DO apply to mobs that can wear boots.
 //
 
 {
