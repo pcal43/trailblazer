@@ -103,8 +103,8 @@ public class FootpathsInitializer implements ModInitializer {
                     gsonRule.timeoutTicks != null ? gsonRule.timeoutTicks : DEFAULT_TIMEOUT_TICKS,
                     gsonRule.entityIds != null ? toIdentifierSet(gsonRule.entityIds) : DEFAULT_ENTITY_IDS,
                     toSpawnGroupList(gsonRule.spawnGroups),
-                    toIdentifierSetList(gsonRule.skipIfBootIds),
-                    toIdentifierSetList(gsonRule.onlyIfBootIds)
+                    toIdentifierSetList(gsonRule.skipIfBoots),
+                    toIdentifierSetList(gsonRule.onlyIfBoots)
             );
             builder.add(rule);
         }
@@ -161,7 +161,7 @@ public class FootpathsInitializer implements ModInitializer {
         Integer stepCount;
         List<String> entityIds;
         List<String> spawnGroups;
-        List<List<String>> onlyIfBootIds;
-        List<List<String>> skipIfBootIds;
+        List<List<String>> onlyIfBoots;
+        List<List<String>> skipIfBoots;
     }
 }

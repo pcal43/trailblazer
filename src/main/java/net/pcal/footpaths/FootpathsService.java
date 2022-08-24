@@ -118,11 +118,11 @@ public class FootpathsService {
         for (Rule rule : blockRules) {
             if (!blockId.equals(rule.blockId())) continue;
             if (!entityRuleSet.contains(rule)) continue;
-            if (!rule.onlyIfBootIds().isEmpty()) {
-                if (!matchesAny(bootInfo, rule.onlyIfBootIds())) continue;
+            if (!rule.onlyIfBoots().isEmpty()) {
+                if (!matchesAny(bootInfo, rule.onlyIfBoots())) continue;
             }
-            if (!rule.skipIfBootIds().isEmpty()) {
-                if (matchesAny(bootInfo, rule.skipIfBootIds())) continue;
+            if (!rule.skipIfBoots().isEmpty()) {
+                if (matchesAny(bootInfo, rule.skipIfBoots())) continue;
             }
             triggerRule(rule, world, pos, block);
             return;
