@@ -79,9 +79,9 @@ class FootpathsRuntimeConfig {
             this.timeoutTicks = timeoutTicks;
             this.entityIds = emptySetIfNull(entityIds);
             this.spawnGroups = emptySetIfNull(spawnGroups);
-            this.skipIfBootIds = emptyLiotIfNull(skipIfBootIds);
-            this.onlyIfBootIds = emptyLiotIfNull(onlyIfBootIds);
-            if (this.skipIfBootIds.isEmpty() && !this.onlyIfBootIds.isEmpty()) {
+            this.skipIfBootIds = emptyListIfNull(skipIfBootIds);
+            this.onlyIfBootIds = emptyListIfNull(onlyIfBootIds);
+            if (!this.skipIfBootIds.isEmpty() && !this.onlyIfBootIds.isEmpty()) {
                 throw new RuntimeException("Rules can't set both skipIfBootIds and onlyIfBootIds");
             }
         }
@@ -90,7 +90,7 @@ class FootpathsRuntimeConfig {
             return set == null ? Collections.emptySet() : set;
         }
 
-        private static <T> List<T> emptyLiotIfNull(List<T> list) {
+        private static <T> List<T> emptyListIfNull(List<T> list) {
             return list == null ? Collections.emptyList() : list;
         }
     }

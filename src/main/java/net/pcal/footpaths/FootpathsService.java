@@ -87,7 +87,7 @@ public class FootpathsService {
     /**
      * This will be called whenever an entity moves to a new block.
      */
-    public void entitySteppedOnBlock(Entity entity) {
+    public void entitySteppingOnBlock(Entity entity, double x, double y, double z) {
         final Set<Rule> entityRuleSet = this.config.getRulesForEntity(entity);
         if (entityRuleSet == null || entityRuleSet.isEmpty()) {
             // Most mob movements presumably won't trigger a rule, so let's short-circuit
@@ -101,7 +101,7 @@ public class FootpathsService {
             return;
         }
         // Ok, figure out what block its standing on
-        final BlockPos pos = entity.getBlockPos().down(1);
+        final BlockPos pos = new BlockPos(x, y, z).down(1);
         final World world = entity.getWorld();
         final BlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();

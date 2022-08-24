@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static org.spongepowered.asm.mixin.injection.At.Shift.AFTER;
 import static org.spongepowered.asm.mixin.injection.At.Shift.BEFORE;
 
 @Mixin(Entity.class)
@@ -22,6 +21,6 @@ public class EntityMoved {
     void _entity_blockPos_update(double x, double y, double z, CallbackInfo ci) {
         final Entity entity = (Entity)(Object)this;
         if (entity.getWorld().isClient()) return; // only process on the server
-        FootpathsService.getInstance().entitySteppedOnBlock(entity);
+        FootpathsService.getInstance().entitySteppingOnBlock(entity, x, y, z);
     }
 }
