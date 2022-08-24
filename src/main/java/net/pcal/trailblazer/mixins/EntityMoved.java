@@ -1,7 +1,7 @@
-package net.pcal.footpaths.mixins;
+package net.pcal.trailblazer.mixins;
 
 import net.minecraft.entity.Entity;
-import net.pcal.footpaths.FootpathsService;
+import net.pcal.trailblazer.TrailblazerService;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,6 +21,6 @@ public class EntityMoved {
     void _entity_blockPos_update(double x, double y, double z, CallbackInfo ci) {
         final Entity entity = (Entity)(Object)this;
         if (entity.getWorld().isClient()) return; // only process on the server
-        FootpathsService.getInstance().entitySteppingOnBlock(entity, x, y, z);
+        TrailblazerService.getInstance().entitySteppingOnBlock(entity, x, y, z);
     }
 }

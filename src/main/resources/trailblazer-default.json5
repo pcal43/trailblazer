@@ -3,7 +3,7 @@
 //
 // If you want to make changes, MAKE A COPY of this file named 'footpaths.json5' and edit that.
 //
-// This file (footpaths-default.json5) is always overwritten on startup to reflect the current default
+// This file (trailblazer-default.json5) is always overwritten on startup to reflect the current default
 // configuration.  This gives you a chance to manually integrate changes into your custom configuration
 // when you update the mod.
 //

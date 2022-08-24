@@ -1,4 +1,4 @@
-package net.pcal.footpaths;
+package net.pcal.trailblazer;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.math.DoubleMath;
@@ -16,7 +16,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.pcal.footpaths.FootpathsRuntimeConfig.Rule;
+import net.pcal.trailblazer.TrailblazerRuntimeConfig.Rule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Central singleton service.
  */
-public class FootpathsService {
+public class TrailblazerService {
 
     // ===================================================================================
     // Constants
@@ -40,14 +40,14 @@ public class FootpathsService {
     // Singleton
 
     private static final class SingletonHolder {
-        private static final FootpathsService INSTANCE;
+        private static final TrailblazerService INSTANCE;
 
         static {
-            INSTANCE = new FootpathsService();
+            INSTANCE = new TrailblazerService();
         }
     }
 
-    public static FootpathsService getInstance() {
+    public static TrailblazerService getInstance() {
         return SingletonHolder.INSTANCE;
     }
 
@@ -69,11 +69,11 @@ public class FootpathsService {
     // ===================================================================================
     // Constructors
 
-    FootpathsService() {
+    TrailblazerService() {
         this.stepCounts = new HashMap<>();
     }
 
-    public void configure(FootpathsRuntimeConfig config) {
+    public void configure(TrailblazerRuntimeConfig config) {
         this.config = requireNonNull(config);
     }
 
@@ -81,7 +81,7 @@ public class FootpathsService {
     // Fields
 
     private final Logger logger = LogManager.getLogger(LOGGER_NAME);
-    private FootpathsRuntimeConfig config;
+    private TrailblazerRuntimeConfig config;
     private final Map<BlockPos, BlockHistory> stepCounts;
 
     /**
