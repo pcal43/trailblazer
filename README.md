@@ -9,7 +9,7 @@ By default, the mod enables two trailblazing effects:
 * **Firewalker Boots.**  If you're wearing Netherite Boots enchanted with Fire Protection and Frost Walker, Lava blocks will change to cobblestone as you walk on them.
 
 ## Features
-* Does NOT add any new blocks to your world.  
+* Does NOT add any new blocks to your world.
 * Does NOT have to be installed on the client
 * Fully customizable.  Change the default effects or create your own.
 * Mobs and players can leave trails

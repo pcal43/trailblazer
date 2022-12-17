@@ -81,11 +81,11 @@ jar {
 // https://github.com/modrinth/minotaur
 modrinth {
 	token = System.getenv("MODRINTH_TOKEN")
-	projectId = "fastback"
+	projectId = "trailblazer"
 	versionNumber = project.mod_version
 	versionType = "release"
 	uploadFile = remapJar
-	changelog = "<p><a href='https://github.com/pcal43/fastback/releases/tag/${project.mod_version}'>https://github.com/pcal43/fastback/releases/tag/${project.mod_version}</a></p>"
+	changelog = "<p><a href='https://github.com/pcal43/trailblazer/releases/tag/${project.mod_version}'>https://github.com/pcal43/trailblazer/releases/tag/${project.mod_version}</a></p>"
 	gameVersions = ["1.19.3"]
 	loaders = ["fabric"]
 	dependencies {
@@ -98,9 +98,9 @@ curseforge {
 	apiKey = System.getenv("CURSEFORGE_TOKEN") ?: 'CURSEFORGE_TOKEN NOT_SET'
 
 	project {
-		id = "667417"
+		id = "621491"
 		releaseType = "release"
-		changelog = "https://github.com/pcal43/fastback/releases/tag/${project.mod_version}"
+		changelog = "https://github.com/pcal43/trailblazer/releases/tag/${project.mod_version}"
 		changelogType = "markdown"
 		mod_version = project.mod_version
 		addGameVersion ((String) project.minecraft_version)
