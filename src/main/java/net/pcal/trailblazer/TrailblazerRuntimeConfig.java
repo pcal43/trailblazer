@@ -3,8 +3,8 @@ package net.pcal.trailblazer;
 import com.google.common.collect.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import java.util.*;
 
@@ -35,7 +35,7 @@ class TrailblazerRuntimeConfig {
     }
 
     Set<Rule> getRulesForEntity(Entity entity) {
-        final Identifier entityId = Registry.ENTITY_TYPE.getId(entity.getType());
+        final Identifier entityId = Registries.ENTITY_TYPE.getId(entity.getType());
         if (this.rulesPerSpawnGroup.isEmpty()) {
             return this.rulesPerEntity.get(entityId);
         } else {

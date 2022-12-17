@@ -12,9 +12,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.pcal.trailblazer.TrailblazerRuntimeConfig.Rule;
 import org.apache.logging.log4j.LogManager;
@@ -105,7 +105,7 @@ public class TrailblazerService {
         final World world = entity.getWorld();
         final BlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();
-        final Identifier blockId = Registry.BLOCK.getId(block);
+        final Identifier blockId = Registries.BLOCK.getId(block);
 
         // Get the rules that might apply to that block.  This just lets us avoid processing
         // rules if they don't apply to the block (which is most of the time).
@@ -156,7 +156,7 @@ public class TrailblazerService {
     private static Set<Identifier> getBootInfo(ItemStack stack) {
         if (!(stack.getItem() instanceof final ArmorItem armor)) return null;
         if (armor.getSlotType() != EquipmentSlot.FEET) return null;
-        final Identifier bootId = Registry.ITEM.getId(stack.getItem());
+        final Identifier bootId = Registries.ITEM.getId(stack.getItem());
         final NbtList enchants = stack.getEnchantments();
         if (enchants == null || enchants.isEmpty()) {
             return ImmutableSet.of(bootId);
@@ -194,7 +194,7 @@ public class TrailblazerService {
         if (blockStepCount >= rule.stepCount()) {
             logger.debug(() -> "changed! " + block + " " + bh);
             final Identifier nextId = rule.nextId();
-            world.setBlockState(pos, Registry.BLOCK.get(nextId).getDefaultState());
+            world.setBlockState(pos, Registries.BLOCK.get(nextId).getDefaultState());
             if (bh != null) this.stepCounts.remove(pos);
         } else {
             if (bh == null) {
