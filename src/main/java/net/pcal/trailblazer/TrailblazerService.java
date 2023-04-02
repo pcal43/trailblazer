@@ -101,7 +101,7 @@ public class TrailblazerService {
             return;
         }
         // Ok, figure out what block its standing on
-        final BlockPos pos = new BlockPos(x, y, z).down(1);
+        final BlockPos pos = BlockPos.ofFloored(x, y, z).down(1);
         final World world = entity.getWorld();
         final BlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();
