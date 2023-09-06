@@ -20,14 +20,20 @@ class TrailblazerRuntimeConfig {
     private final ListMultimap<Identifier, Rule> rulesPerBlock = ArrayListMultimap.create();
     private final SetMultimap<Identifier, Rule> rulesPerEntity = HashMultimap.create();
     private final SetMultimap<SpawnGroup, Rule> rulesPerSpawnGroup = HashMultimap.create();
+    private final int stepCacheSize;
 
-    TrailblazerRuntimeConfig(List<Rule> rules) {
+    TrailblazerRuntimeConfig(List<Rule> rules, int stepCacheSize) {
         this.rules = requireNonNull(rules);
+        this.stepCacheSize = stepCacheSize;
         for (final Rule rule : rules) {
             this.rulesPerBlock.put(rule.blockId(), rule);
             rule.entityIds().forEach(id -> this.rulesPerEntity.put(id, rule));
             rule.spawnGroups().forEach(group -> this.rulesPerSpawnGroup.put(group, rule));
         }
+    }
+
+    int getStepCacheSize() {
+        return this.stepCacheSize;
     }
 
     List<Rule> getRuleListForBlock(Identifier blockId) {
