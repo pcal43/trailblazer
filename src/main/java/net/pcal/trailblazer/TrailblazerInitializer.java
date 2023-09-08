@@ -34,6 +34,7 @@ public class TrailblazerInitializer implements ModInitializer {
     private static final String CONFIG_RESOURCE_NAME = "trailblazer-default.json5";
     public static final int DEFAULT_STEP_COUNT = 0;
     public static final int DEFAULT_TIMEOUT_TICKS = 72000;
+    private static final int DEFAULT_STEP_CACHE_SIZE = 500;
 
     // ===================================================================================
     // ModInitializer implementation
@@ -107,7 +108,8 @@ public class TrailblazerInitializer implements ModInitializer {
             );
             builder.add(rule);
         }
-        return new TrailblazerRuntimeConfig(builder.build());
+        final int stepCacheSize = config.stepCacheSize == null ? DEFAULT_STEP_CACHE_SIZE : config.stepCacheSize;
+        return new TrailblazerRuntimeConfig(builder.build(), stepCacheSize);
     }
 
     private static Set<Identifier> toIdentifierSet(List<String> rawIds) {
@@ -150,6 +152,7 @@ public class TrailblazerInitializer implements ModInitializer {
 
     public static class GsonModConfig {
         List<GsonRuleConfig> rules;
+        Integer stepCacheSize;
     }
 
     public static class GsonRuleConfig {

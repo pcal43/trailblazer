@@ -70,7 +70,16 @@ public class TrailblazerService {
     // Constructors
 
     TrailblazerService() {
-        this.stepCounts = new HashMap<>();
+        this.stepCounts = new LinkedHashMap<>(500, 0.75f, true) {
+            protected boolean removeEldestEntry(Map.Entry eldest) {
+                if (config == null) {
+                    logger.warn("config not set.  something is very wrong");
+                    return false;
+                } else {
+                    return size() > config.getStepCacheSize();
+                }
+            }
+        };
     }
 
     public void configure(TrailblazerRuntimeConfig config) {

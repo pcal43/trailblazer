@@ -103,7 +103,10 @@
       'nextBlockId'    : 'minecraft:cobblestone',
       'onlyIfBoots'    : [ [ 'minecraft:netherite_boots' , 'minecraft:frost_walker', 'minecraft:fire_protection' ] ]
     }
-  ]
+  ],
+  // How many blocks to 'remember' being stepped on.  Increase to remember more; decrease if you're having memory
+  // issues (it doesn't use up much).
+  'stepCacheSize' : 500
 }
 
 
