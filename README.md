@@ -1,5 +1,8 @@
-![](https://media.forgecdn.net/attachments/686/168/trailblazer2.gif "")
+
 # Trailblazer
+
+![](https://github.com/pcal43/trailblazer/blob/main/etc/trailblazer-movie.gif?raw=true)
+
 
 Trailblazer is a Fabric minecraft mod that changes blocks as they are walked on by players and mobs.
 
@@ -32,9 +35,8 @@ This mod is published under the [MIT License](LICENSE).
 You're free to include this mod in your modpack provided you attribute it to pcal.net.
 
 
-## Credit
+## Acknowledgements
 Video by wormstweaker
-
 
 ## Questions?
 
