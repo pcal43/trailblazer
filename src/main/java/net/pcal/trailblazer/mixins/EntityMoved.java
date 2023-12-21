@@ -17,7 +17,7 @@ public class EntityMoved {
     //private BlockPos blockPos;
 
     // get notified any time an entity's blockPos is updated
-    @Inject(method = "setPos", at = @At(value = "FIELD", shift = BEFORE, opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/entity/Entity;blockPos:Lnet/minecraft/core/BlockPos;"))
+    @Inject(method = "setPosRaw(DDD)V", at = @At(value = "FIELD", shift = BEFORE, opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/entity/Entity;blockPosition:Lnet/minecraft/core/BlockPos;"))
     void _entity_blockPos_update(double x, double y, double z, CallbackInfo ci) {
         final Entity entity = (Entity)(Object)this;
         if (entity.level().isClientSide()) return; // only process on the server
