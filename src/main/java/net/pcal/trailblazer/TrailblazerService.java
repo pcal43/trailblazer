@@ -2,20 +2,19 @@ package net.pcal.trailblazer;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.math.DoubleMath;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.pcal.trailblazer.TrailblazerRuntimeConfig.Rule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -110,11 +109,11 @@ public class TrailblazerService {
             return;
         }
         // Ok, figure out what block its standing on
-        final BlockPos pos = BlockPos.ofFloored(x, y, z).down(1);
-        final World world = entity.getWorld();
+        final BlockPos pos = BlockPos.containing(x, y, z).below(1);
+        final Level world = entity.level();
         final BlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();
-        final Identifier blockId = Registries.BLOCK.getId(block);
+        final ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
 
         // Get the rules that might apply to that block.  This just lets us avoid processing
         // rules if they don't apply to the block (which is most of the time).
@@ -123,7 +122,7 @@ public class TrailblazerService {
 
         logger.debug(() -> "checking " + blockId);
 
-        final Set<Identifier> bootInfo = getBootInfo(entity);
+        final Set<ResourceLocation> bootInfo = getBootInfo(entity);
         for (Rule rule : blockRules) {
             if (!blockId.equals(rule.blockId())) continue;
             if (!entityRuleSet.contains(rule)) continue;
@@ -138,22 +137,22 @@ public class TrailblazerService {
         }
     }
 
-    private static boolean matchesAny(Set<Identifier> bootInfo, List<Set<Identifier>> setList) {
-        for (final Set<Identifier> set : setList) {
+    private static boolean matchesAny(Set<ResourceLocation> bootInfo, List<Set<ResourceLocation>> setList) {
+        for (final Set<ResourceLocation> set : setList) {
             if (bootInfo.containsAll(set)) return true;
         }
         return false;
     }
 
 
-    private static final Set<Identifier> BAREFOOT = ImmutableSet.of(new Identifier("minecraft:none"));
+    private static final Set<ResourceLocation> BAREFOOT = ImmutableSet.of(new ResourceLocation("minecraft:none"));
 
     /**
      * Return info for the boots the player is wearing.
      */
     private static Set getBootInfo(Entity entity) {
-        for (ItemStack armor : entity.getArmorItems()) {
-            final Set<Identifier> bootInfo = getBootInfo(armor);
+        for (ItemStack armor : entity.getArmorSlots()) {
+            final Set<ResourceLocation> bootInfo = getBootInfo(armor);
             if (bootInfo != null) return bootInfo;
         }
         return BAREFOOT;
@@ -162,34 +161,34 @@ public class TrailblazerService {
         /**
          * Return info about the footwear in the given stack, or null if it isn't footwear.
          */
-    private static Set<Identifier> getBootInfo(ItemStack stack) {
+    private static Set<ResourceLocation> getBootInfo(ItemStack stack) {
         if (!(stack.getItem() instanceof final ArmorItem armor)) return null;
-        if (armor.getSlotType() != EquipmentSlot.FEET) return null;
-        final Identifier bootId = Registries.ITEM.getId(stack.getItem());
-        final NbtList enchants = stack.getEnchantments();
+        if (armor.getEquipmentSlot() != EquipmentSlot.FEET) return null;
+        final ResourceLocation bootId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        final ListTag enchants = stack.getEnchantmentTags();
         if (enchants == null || enchants.isEmpty()) {
             return ImmutableSet.of(bootId);
         } else {
-            final Set<Identifier> bootInfo = new HashSet<>();
+            final Set<ResourceLocation> bootInfo = new HashSet<>();
             bootInfo.add(bootId);
-            for (final NbtElement enchant : enchants) {
-                if (enchant instanceof final NbtCompound compound) {
+            for (final Tag enchant : enchants) {
+                if (enchant instanceof final CompoundTag compound) {
                     final String id = requireNonNull(compound.getString("id"));
                     // final int lvl = compound.getInt("lvl"); TODO someday?
-                    bootInfo.add(new Identifier(id));
+                    bootInfo.add(new ResourceLocation(id));
                 }
             }
             return bootInfo;
         }
     }
 
-    private void triggerRule(Rule rule, World world, BlockPos pos, Block block) {
+    private void triggerRule(Rule rule, Level world, BlockPos pos, Block block) {
         final BlockHistory bh = this.stepCounts.get(pos);
         final int blockStepCount;
         if (bh == null) {
             blockStepCount = 1;
         } else {
-            if (rule.timeoutTicks() > 0 && (world.getTime() - bh.lastStepTimestamp) > rule.timeoutTicks()) {
+            if (rule.timeoutTicks() > 0 && (world.getGameTime() - bh.lastStepTimestamp) > rule.timeoutTicks()) {
                 logger.debug(() -> "step timeout " + block + " " + bh);
                 blockStepCount = 1;
                 bh.stepCount = 1;
@@ -198,16 +197,16 @@ public class TrailblazerService {
                 bh.stepCount++;
                 blockStepCount = bh.stepCount;
             }
-            bh.lastStepTimestamp = world.getTime();
+            bh.lastStepTimestamp = world.getGameTime();
         }
         if (blockStepCount >= rule.stepCount()) {
             logger.debug(() -> "changed! " + block + " " + bh);
-            final Identifier nextId = rule.nextId();
-            world.setBlockState(pos, Registries.BLOCK.get(nextId).getDefaultState());
+            final ResourceLocation nextId = rule.nextId();
+            world.setBlockAndUpdate(pos, BuiltInRegistries.BLOCK.get(nextId).defaultBlockState());
             if (bh != null) this.stepCounts.remove(pos);
         } else {
             if (bh == null) {
-                this.stepCounts.put(pos, new BlockHistory(blockStepCount, world.getTime()));
+                this.stepCounts.put(pos, new BlockHistory(blockStepCount, world.getGameTime()));
             }
         }
     }
