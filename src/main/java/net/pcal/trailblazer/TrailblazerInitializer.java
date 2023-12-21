@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.MobCategory;
 import net.pcal.trailblazer.TrailblazerRuntimeConfig.Rule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +30,7 @@ public class TrailblazerInitializer implements ModInitializer {
 
     private static final Path CUSTOM_CONFIG_PATH = Paths.get("config", "trailblazer.json5");
     private static final Path DEFAULT_CONFIG_PATH = Paths.get("config", "trailblazer-default.json5");
-    private static final Set<Identifier> DEFAULT_ENTITY_IDS = ImmutableSet.of(new Identifier("minecraft:player"));
+    private static final Set<ResourceLocation> DEFAULT_ENTITY_IDS = ImmutableSet.of(new ResourceLocation("minecraft:player"));
     private static final String CONFIG_RESOURCE_NAME = "trailblazer-default.json5";
     public static final int DEFAULT_STEP_COUNT = 0;
     public static final int DEFAULT_TIMEOUT_TICKS = 72000;
@@ -97,8 +97,8 @@ public class TrailblazerInitializer implements ModInitializer {
             final GsonRuleConfig gsonRule = config.rules.get(i);
             final Rule rule = new Rule(
                     gsonRule.name != null ? gsonRule.name : "rule-"+i,
-                    new Identifier(requireNonNull(gsonRule.blockId)),
-                    new Identifier(requireNonNull(gsonRule.nextBlockId)),
+                    new ResourceLocation(requireNonNull(gsonRule.blockId)),
+                    new ResourceLocation(requireNonNull(gsonRule.nextBlockId)),
                     gsonRule.stepCount != null ? gsonRule.stepCount : DEFAULT_STEP_COUNT,
                     gsonRule.timeoutTicks != null ? gsonRule.timeoutTicks : DEFAULT_TIMEOUT_TICKS,
                     gsonRule.entityIds != null ? toIdentifierSet(gsonRule.entityIds) : DEFAULT_ENTITY_IDS,
@@ -112,28 +112,28 @@ public class TrailblazerInitializer implements ModInitializer {
         return new TrailblazerRuntimeConfig(builder.build(), stepCacheSize);
     }
 
-    private static Set<Identifier> toIdentifierSet(List<String> rawIds) {
+    private static Set<ResourceLocation> toIdentifierSet(List<String> rawIds) {
         if (rawIds == null) return Collections.emptySet();
-        final ImmutableSet.Builder<Identifier> builder = ImmutableSet.builder();
+        final ImmutableSet.Builder<ResourceLocation> builder = ImmutableSet.builder();
         for (String rawId : rawIds) {
-            builder.add(new Identifier(rawId));
+            builder.add(new ResourceLocation(rawId));
         }
         return builder.build();
     }
 
-    private static List<Set<Identifier>> toIdentifierSetList(List<List<String>> rawIdLists) {
+    private static List<Set<ResourceLocation>> toIdentifierSetList(List<List<String>> rawIdLists) {
         if (rawIdLists == null) return Collections.emptyList();
-        final ImmutableList.Builder<Set<Identifier>> builder = ImmutableList.builder();
+        final ImmutableList.Builder<Set<ResourceLocation>> builder = ImmutableList.builder();
         for (List<String> rawIdList : rawIdLists) {
             builder.add(toIdentifierSet(rawIdList));
         }
         return builder.build();
     }
 
-    private static Set<SpawnGroup> toSpawnGroupList(Iterable<String> rawIds) {
+    private static Set<MobCategory> toSpawnGroupList(Iterable<String> rawIds) {
         if (rawIds == null) return Collections.emptySet();
-        final ImmutableSet.Builder<SpawnGroup> builder = ImmutableSet.builder();
-        rawIds.forEach(sg -> builder.add(SpawnGroup.valueOf(sg)));
+        final ImmutableSet.Builder<MobCategory> builder = ImmutableSet.builder();
+        rawIds.forEach(sg -> builder.add(MobCategory.valueOf(sg)));
         return builder.build();
     }
 

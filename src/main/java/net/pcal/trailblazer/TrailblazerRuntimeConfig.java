@@ -1,12 +1,11 @@
 package net.pcal.trailblazer;
 
 import com.google.common.collect.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
 import java.util.*;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobCategory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,9 +16,9 @@ import static java.util.Objects.requireNonNull;
 class TrailblazerRuntimeConfig {
 
     private final List<Rule> rules;
-    private final ListMultimap<Identifier, Rule> rulesPerBlock = ArrayListMultimap.create();
-    private final SetMultimap<Identifier, Rule> rulesPerEntity = HashMultimap.create();
-    private final SetMultimap<SpawnGroup, Rule> rulesPerSpawnGroup = HashMultimap.create();
+    private final ListMultimap<ResourceLocation, Rule> rulesPerBlock = ArrayListMultimap.create();
+    private final SetMultimap<ResourceLocation, Rule> rulesPerEntity = HashMultimap.create();
+    private final SetMultimap<MobCategory, Rule> rulesPerSpawnGroup = HashMultimap.create();
     private final int stepCacheSize;
 
     TrailblazerRuntimeConfig(List<Rule> rules, int stepCacheSize) {
@@ -36,16 +35,16 @@ class TrailblazerRuntimeConfig {
         return this.stepCacheSize;
     }
 
-    List<Rule> getRuleListForBlock(Identifier blockId) {
+    List<Rule> getRuleListForBlock(ResourceLocation blockId) {
         return this.rulesPerBlock.get(blockId);
     }
 
     Set<Rule> getRulesForEntity(Entity entity) {
-        final Identifier entityId = Registries.ENTITY_TYPE.getId(entity.getType());
+        final ResourceLocation entityId = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
         if (this.rulesPerSpawnGroup.isEmpty()) {
             return this.rulesPerEntity.get(entityId);
         } else {
-            final SpawnGroup spawnGroup = entity.getType().getSpawnGroup();
+            final MobCategory spawnGroup = entity.getType().getCategory();
             final Set<Rule> spawnGroupRules = this.rulesPerSpawnGroup.get(spawnGroup);
             if (spawnGroupRules.isEmpty()) {
                 return this.rulesPerEntity.get(entityId);
@@ -58,26 +57,26 @@ class TrailblazerRuntimeConfig {
 
     record Rule(
             String name,
-            Identifier blockId,
-            Identifier nextId,
+            ResourceLocation blockId,
+            ResourceLocation nextId,
             int stepCount,
             int timeoutTicks,
-            Set<Identifier> entityIds,
-            Set<SpawnGroup> spawnGroups,
-            List<Set<Identifier>> skipIfBoots,
-            List<Set<Identifier>> onlyIfBoots
+            Set<ResourceLocation> entityIds,
+            Set<MobCategory> spawnGroups,
+            List<Set<ResourceLocation>> skipIfBoots,
+            List<Set<ResourceLocation>> onlyIfBoots
     ) {
 
         Rule(
                 String name,
-                Identifier blockId,
-                Identifier nextId,
+                ResourceLocation blockId,
+                ResourceLocation nextId,
                 int stepCount,
                 int timeoutTicks,
-                Set<Identifier> entityIds,
-                Set<SpawnGroup> spawnGroups,
-                List<Set<Identifier>> skipIfBoots,
-                List<Set<Identifier>> onlyIfBoots) {
+                Set<ResourceLocation> entityIds,
+                Set<MobCategory> spawnGroups,
+                List<Set<ResourceLocation>> skipIfBoots,
+                List<Set<ResourceLocation>> onlyIfBoots) {
             this.name = name != null ? name : "unnamed";
             this.blockId = requireNonNull(blockId);
             this.nextId = requireNonNull(nextId);

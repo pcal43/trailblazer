@@ -1,6 +1,6 @@
 package net.pcal.trailblazer.mixins;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import net.pcal.trailblazer.TrailblazerService;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,10 +17,10 @@ public class EntityMoved {
     //private BlockPos blockPos;
 
     // get notified any time an entity's blockPos is updated
-    @Inject(method = "setPos", at = @At(value = "FIELD", shift = BEFORE, opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/entity/Entity;blockPos:Lnet/minecraft/util/math/BlockPos;"))
+    @Inject(method = "setPos", at = @At(value = "FIELD", shift = BEFORE, opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/entity/Entity;blockPos:Lnet/minecraft/core/BlockPos;"))
     void _entity_blockPos_update(double x, double y, double z, CallbackInfo ci) {
         final Entity entity = (Entity)(Object)this;
-        if (entity.getWorld().isClient()) return; // only process on the server
+        if (entity.level().isClientSide()) return; // only process on the server
         TrailblazerService.getInstance().entitySteppingOnBlock(entity, x, y, z);
     }
 }
