@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static org.spongepowered.asm.mixin.injection.At.Shift.BEFORE;
 
 @Mixin(Entity.class)
-public class EntityMoved {
+public class EntityMixin {
 
     //@Shadow
     //private BlockPos blockPos;

@@ -4,7 +4,7 @@
   "package": "net.pcal.trailblazer.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "EntityMoved"
+    "EntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
