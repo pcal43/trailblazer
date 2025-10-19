@@ -1,25 +1,30 @@
 package net.pcal.trailblazer;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.gson.Gson;
-import net.fabricmc.api.ModInitializer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.MobCategory;
-import net.pcal.trailblazer.TrailblazerRuntimeConfig.Rule;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
 
-import static java.util.Objects.requireNonNull;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
+
+import net.fabricmc.api.ModInitializer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.MobCategory;
+import net.pcal.trailblazer.TrailblazerRuntimeConfig.Rule;
 import static net.pcal.trailblazer.TrailblazerService.LOGGER_NAME;
 import static net.pcal.trailblazer.TrailblazerService.LOG_PREFIX;
 
@@ -30,7 +35,7 @@ public class TrailblazerInitializer implements ModInitializer {
 
     private static final Path CUSTOM_CONFIG_PATH = Paths.get("config", "trailblazer.json5");
     private static final Path DEFAULT_CONFIG_PATH = Paths.get("config", "trailblazer-default.json5");
-    private static final Set<ResourceLocation> DEFAULT_ENTITY_IDS = ImmutableSet.of(new ResourceLocation("minecraft:player"));
+    private static final Set<ResourceLocation> DEFAULT_ENTITY_IDS = ImmutableSet.of(ResourceLocation.parse("minecraft:player"));
     private static final String CONFIG_RESOURCE_NAME = "trailblazer-default.json5";
     public static final int DEFAULT_STEP_COUNT = 0;
     public static final int DEFAULT_TIMEOUT_TICKS = 72000;
@@ -97,8 +102,8 @@ public class TrailblazerInitializer implements ModInitializer {
             final GsonRuleConfig gsonRule = config.rules.get(i);
             final Rule rule = new Rule(
                     gsonRule.name != null ? gsonRule.name : "rule-"+i,
-                    new ResourceLocation(requireNonNull(gsonRule.blockId)),
-                    new ResourceLocation(requireNonNull(gsonRule.nextBlockId)),
+                    ResourceLocation.parse(requireNonNull(gsonRule.blockId)),
+                    ResourceLocation.parse(requireNonNull(gsonRule.nextBlockId)),
                     gsonRule.stepCount != null ? gsonRule.stepCount : DEFAULT_STEP_COUNT,
                     gsonRule.timeoutTicks != null ? gsonRule.timeoutTicks : DEFAULT_TIMEOUT_TICKS,
                     gsonRule.entityIds != null ? toIdentifierSet(gsonRule.entityIds) : DEFAULT_ENTITY_IDS,
@@ -116,7 +121,7 @@ public class TrailblazerInitializer implements ModInitializer {
         if (rawIds == null) return Collections.emptySet();
         final ImmutableSet.Builder<ResourceLocation> builder = ImmutableSet.builder();
         for (String rawId : rawIds) {
-            builder.add(new ResourceLocation(rawId));
+            builder.add(ResourceLocation.parse(rawId));
         }
         return builder.build();
     }

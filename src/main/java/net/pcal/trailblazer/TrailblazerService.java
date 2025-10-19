@@ -1,27 +1,30 @@
 package net.pcal.trailblazer;
 
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import static java.util.Objects.requireNonNull;
+import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.math.DoubleMath;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.pcal.trailblazer.TrailblazerRuntimeConfig.Rule;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.*;
-
-import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -145,15 +148,18 @@ public class TrailblazerService {
     }
 
 
-    private static final Set<ResourceLocation> BAREFOOT = ImmutableSet.of(new ResourceLocation("minecraft:none"));
+    private static final Set<ResourceLocation> BAREFOOT = ImmutableSet.of(ResourceLocation.parse("minecraft:none"));
 
     /**
      * Return info for the boots the player is wearing.
      */
     private static Set getBootInfo(Entity entity) {
-        for (ItemStack armor : entity.getArmorSlots()) {
-            final Set<ResourceLocation> bootInfo = getBootInfo(armor);
-            if (bootInfo != null) return bootInfo;
+        if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
+            final ItemStack boots = livingEntity.getItemBySlot(EquipmentSlot.FEET);
+            if (boots != null && !boots.isEmpty()) {
+                final Set<ResourceLocation> bootInfo = getBootInfo(boots);
+                if (bootInfo != null) return bootInfo;
+            }
         }
         return BAREFOOT;
     }
@@ -165,17 +171,16 @@ public class TrailblazerService {
         if (!(stack.getItem() instanceof final ArmorItem armor)) return null;
         if (armor.getEquipmentSlot() != EquipmentSlot.FEET) return null;
         final ResourceLocation bootId = BuiltInRegistries.ITEM.getKey(stack.getItem());
-        final ListTag enchants = stack.getEnchantmentTags();
+        final ItemEnchantments enchants = stack.getEnchantments();
         if (enchants == null || enchants.isEmpty()) {
             return ImmutableSet.of(bootId);
         } else {
             final Set<ResourceLocation> bootInfo = new HashSet<>();
             bootInfo.add(bootId);
-            for (final Tag enchant : enchants) {
-                if (enchant instanceof final CompoundTag compound) {
-                    final String id = requireNonNull(compound.getString("id"));
-                    // final int lvl = compound.getInt("lvl"); TODO someday?
-                    bootInfo.add(new ResourceLocation(id));
+            for (final var entry : enchants.entrySet()) {
+                final ResourceLocation enchantId = entry.getKey().unwrapKey().map(key -> key.location()).orElse(null);
+                if (enchantId != null) {
+                    bootInfo.add(enchantId);
                 }
             }
             return bootInfo;
